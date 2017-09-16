@@ -88,14 +88,17 @@ for i, item in enumerate(before_files):
     device['files'] = []
     device['files'].append(os.path.abspath(mop_path + '/' + before_files[i]))
     device['files'].append(os.path.abspath(mop_path + "/" + after_files[i]))
+    device['before_kw'] = before_kw
+    device['after_kw'] = after_kw
     #device['mop_path'] = mop_path
     #device['mop_number'] = mop_number
     device['os_type'] = subprocess.Popen(
                     ["gimme", "os_type", device['hostname']], stdout=subprocess.PIPE).communicate()
     device['os_type'] = device['os_type'][0].rstrip()
-    print device
+    print "Running " + device['hostname']
+
     # Extract commands & output
-    commands = the_extractorator.run(device)
+    device['output'] = the_extractorator.run(device)
 
     # Compare command output
     results = the_differentiator(commands)

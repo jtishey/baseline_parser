@@ -8,8 +8,8 @@ john.tishey@windstream.com 2017
 def run(device):
     """ Get device and baselines """
     if device['os_type'] == 'JUNOS':
-        #commands = get_commands_juniper()
-        extract_junos(device)
+        output = extract_junos(device)
+        return output
     elif device['os_type'] == 'IOS':
         #commands = get_commands_ios()
         #extract_ios(device)
@@ -33,7 +33,7 @@ def extract_junos(device):
     commands = {}
     current_command = ''
     # Open baseline files and loop through lines
-    for i, _file in enumerate(device['files']):
+    for _file in device['files']:
         with open(_file) as _f:
             baseline_text = _f.readlines()
         for line in baseline_text:
@@ -50,5 +50,8 @@ def extract_junos(device):
                 if current_command is not '':
                     if line != '' and line != '{master}':
                         commands[current_command].append(line)
-        output[i] = commands
+        if device['before_kw'] in _file:
+            output['before'] = commands
+        else:
+            output['after'] =  commands
     return output
