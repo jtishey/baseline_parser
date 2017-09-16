@@ -28,10 +28,12 @@ def run(device):
 # Step 3: Split into individual commands
 def extract_junos(device):
     """ extract commands from baselines """
-    prompt = 'deip@' + device['hostname'] + '>'
+    prompt = 'deip@' + device['hostname']
+    output = {}
     commands = {}
+    current_command = ''
     # Open baseline files and loop through lines
-    for _file in device['files']:
+    for i, _file in enumerate(device['files']):
         with open(_file) as _f:
             baseline_text = _f.readlines()
         for line in baseline_text:
@@ -39,9 +41,14 @@ def extract_junos(device):
             # if there's a prompt, set it as a new command
             # and capture subsequent lines under it
             if prompt in line:
-                current_command = line
-                commands[current_command] = []
+                if line[-1] != '>':
+                    line = line.replace(prompt + '-re0>', '')
+                    line = line.replace(prompt + '-re1>', '')
+                    current_command = line
+                    commands[current_command] = []
             else:
-                if current_command:
-                    commands[current_command].append(line)
-        
+                if current_command is not '':
+                    if line != '' and line != '{master}':
+                        commands[current_command].append(line)
+        output[i] = commands
+    return output
