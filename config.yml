@@ -1,0 +1,8 @@
+JUNOS:
+  - test_isis_adjacnecy.yml
+
+IOS:
+  - test_isis_neighbor.yml
+
+XR:
+  - test_isis_neighbor.yml
