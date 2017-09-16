@@ -5,46 +5,43 @@ john.tishey@windstream.com 2017
 """
 
 # Step 1: Get the device hostname and Vendor/OS
-def run(device, before, after):
+def run(device):
     """ Get device and baselines """
     if device['os_type'] == 'JUNOS':
         #commands = get_commands_juniper()
-        extract_junos(device, before, after)
+        extract_junos(device)
     elif device['os_type'] == 'IOS':
         #commands = get_commands_ios()
-        extract_ios(device, before, after)
+        #extract_ios(device)
+        print("ERROR: IOS not supported yet")
+        return
     elif device['os_type'] == 'xr':
         #commands = get_commands_xr()
-        extract_xr(device, before, after)
+        #extract_xr(device)
+        print("ERROR: XR not supported yet")
+        return
     else:
-        print("ERROR: Device OS not yet supported")
+        print("ERROR: Device OS not found or not yet supported")
         return ""
-
-## Step 2: Get command list or prompt string
-#def get_commands_juniper():
-#    """ get commands list """
-#
-#def get_commands_ios():
-#    """ get commands list """
-#
-#def get_commands_xr():
-#    """ get commands list """
 
 
 # Step 3: Split into individual commands
-def extract_junos(device, before, after):
+def extract_junos(device):
     """ extract commands from baselines """
     prompt = 'deip@' + device['hostname'] + '>'
-
-
-def extract_ios(device, before, after, commands):
-    """ extract commands from baselines """
-    pass
-
-
-def extract_xr(device, before, after, commands):
-    """ extract commands from baselines """
-    pass
-
-
-# Step 4: Do any formatting and return
+    commands = {}
+    # Open baseline files and loop through lines
+    for _file in device['files']:
+        with open(_file) as _f:
+            baseline_text = _f.readlines()
+        for line in baseline_text:
+            line = line.rstrip()
+            # if there's a prompt, set it as a new command
+            # and capture subsequent lines under it
+            if prompt in line:
+                current_command = line
+                commands[current_command] = []
+            else:
+                if current_command:
+                    commands[current_command].append(line)
+        
