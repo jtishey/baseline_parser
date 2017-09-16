@@ -1,5 +1,5 @@
 JUNOS:
-  - test_isis_adjacnecy.yml
+  - test_isis_adjacency.yml
 
 IOS:
   - test_isis_neighbor.yml
