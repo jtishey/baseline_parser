@@ -22,12 +22,14 @@ def run(device):
             test_values = yaml.load(_f.read())
         before_cmd = device['output']['before'][test_values[0]['command']]
         after_cmd = device['output']['after'][test_values[0]['command']]
+        print("Testing command: " + test_values[0]['command'])
         execute_diff(device, test_values, before_cmd, after_cmd)
 
 
 def execute_diff(device, test_values, before, after):
     """ Gets before/after command and yaml test values to compare """
     # First, determine the test from test_values:
+    totals = {'PASS': 0, 'FAIL': 0}
     for line in before[:]:
         pass_status = 'UNSET'
         skip_line = False
@@ -64,11 +66,13 @@ def execute_diff(device, test_values, before, after):
             if pass_status == 'UNSET':
                 pass_status = 'FAIL'
             if pass_status == 'FAIL':
+                totals['FAIL'] += 1
                 msg = jinja2.Template(str(test_values[0]['tests'][0]['err']))
                 if after_line == '':
                     after_line = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
                 print msg.render(device=device, pre=line, post=after_line)
             else:
+                totals['PASS'] += 1
                 if device['verbose'] is True:
                     msg = jinja2.Template(str(test_values[0]['tests'][0]['info']))
                     if after_line == '':
@@ -81,9 +85,13 @@ def execute_diff(device, test_values, before, after):
                 if word in after_line:
                     skip_line = True
             if skip_line is False:
+                totals['FAIL'] += 1
                 after_line = after_line.split()
                 line = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
                 msg = jinja2.Template(str(test_values[0]['tests'][0]['err']))
                 #print msg.render(device=device, pre=line, post=after_line)
                 print 'FAILED! ISIS adj to ' + after_line[1] + ' on ' + after_line[0] + ' is now ' + after_line[3]
-
+    if totals['FAIL'] == 0:
+        print("PASS! All " + totals['PASS'] + " tests passed!")
+    else:
+        print("FAIL! " + totals['PASS'] + " tests passed, " + totals['FAIL'] + " tests failed!")
