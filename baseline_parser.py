@@ -16,27 +16,26 @@ def arguments():
     """ Parse entered CLI arguments with argparse """
     parser = argparse.ArgumentParser(description='Parse and compare before/after Pinky_Baseliner files.')
     parser.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
-    parser.add_argument('-a', '--after', help='Keyword to identify "After" files (defautl=before', required=False)
-    parser.add_argument('-b', '--before', help='Keyword to identify "Before" files (defautl=before', required=False)
+    parser.add_argument('-a', '--after', help='Keyword to identify "After" files (defautl=after)', required=False)
+    parser.add_argument('-b', '--before', help='Keyword to identify "Before" files (defautl=before)', required=False)
+    parser.add_argument('-v', '--verbose', help='Display verbose output', required=False)
     args = vars(parser.parse_args())
+    verbose = False
+    tag1 = 'before'
+    tag2 = 'after'
+
     if args['mop']:
         mop = args['mop']
+    if args['verbose']:
+        verbose = True
     if args['before']:
         tag1 = args['before']
-    else:
-        tag1 = 'before'
     if args['after']:
         tag2 = args['after']
-    else:
-        tag2 = 'after'
     if mop == '':
         print("ERROR: Please enter a valid MOP number.  Use --help for usage info.")
         exit(1)
-    return mop, tag1, tag2
-## testing args
-#mop_number = '234484'
-#before_kw = 'before'
-#after_kw = 'after'
+    return mop, tag1, tag2, verbose
 
 
 def folder_search(mop_number):
@@ -70,7 +69,7 @@ def file_search(keyword1, keyword2):
 
 
 # Step 1: Get the CLI arguments
-mop_number, before_kw, after_kw = arguments()
+mop_number, before_kw, after_kw, verbose = arguments()
 
 # Step 2: Find the baseline folder
 mop_path = folder_search(mop_number)
@@ -84,6 +83,7 @@ for i, item in enumerate(before_files):
     # Make a device dict to send to the extractorator
     device = {}
     device['hostname'] = str(item.split('.')[1] + '.' + item.split('.')[2])
+    device['verbose'] = verbose
     device['files'] = []
     device['files'].append(os.path.abspath(mop_path + '/' + before_files[i]))
     device['files'].append(os.path.abspath(mop_path + "/" + after_files[i]))
@@ -97,6 +97,13 @@ for i, item in enumerate(before_files):
 
     # Extract commands & output
     device['output'] = the_extractorator.run(device)
+#    if device['os_type'] == 'IOS':
+#        print "BEFORE OUTPUT:"
+#        print device['output']['before']['show isis neighbor']
+#        print '=====================\n'
+#        print "AFTER OUTPUT:"
+#        print device['output']['after']['show isis neighbor']
+#        print '====================='
 
     # Compare command output
     results = the_differentiator.run(device)

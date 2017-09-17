@@ -8,50 +8,50 @@ john.tishey@windstream.com 2017
 def run(device):
     """ Get device and baselines """
     if device['os_type'] == 'JUNOS':
-        output = extract_junos(device)
+        prompt = 'deip@' + device['hostname']
+        output = extract(device, prompt)
         return output
     elif device['os_type'] == 'IOS':
-        #commands = get_commands_ios()
-        #extract_ios(device)
-        print("ERROR: IOS not supported yet")
-        return
+        prompt = device['hostname'] + '#'
+        output = extract(device, prompt)
+        return output
     elif device['os_type'] == 'xr':
-        #commands = get_commands_xr()
-        #extract_xr(device)
-        print("ERROR: XR not supported yet")
-        return
+        prompt = 'RP/0/RP0/CPU0:' + device['hostname'] + '#'
+        output = extract(device, prompt)
+        return output
     else:
         print("ERROR: Device OS not found or not yet supported")
         return ""
 
 
 # Step 3: Split into individual commands
-def extract_junos(device):
+def extract(device, prompt):
     """ extract commands from baselines """
-    prompt = 'deip@' + device['hostname']
-    output = {}
-    commands = {}
-    current_command = ''
     # Open baseline files and loop through lines
-    for _file in device['files']:
-        with open(_file) as _f:
+    output = {}
+    for each_file in device['files']:
+        with open(each_file) as _f:
             baseline_text = _f.readlines()
+        commands = {}
+        current_command = ''
         for line in baseline_text:
             line = line.rstrip()
             # if there's a prompt, set it as a new command
             # and capture subsequent lines under it
             if prompt in line:
-                if line[-1] != '>':
+                if line[-1] != '>' or line[-1] != '#':
                     line = line.replace(prompt + '-re0>', '')
                     line = line.replace(prompt + '-re1>', '')
+                    line = line.replace(prompt, '')
                     current_command = line
                     commands[current_command] = []
             else:
                 if current_command is not '':
                     if line != '' and line != '{master}':
                         commands[current_command].append(line)
-        if device['before_kw'] in _file:
+        if device['before_kw'] in each_file:
             output['before'] = commands
         else:
             output['after'] =  commands
     return output
+
