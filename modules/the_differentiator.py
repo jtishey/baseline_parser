@@ -17,7 +17,9 @@ def run(device):
         config = yaml.load(_f)
     test_list = config[(device['os_type'])]
     test_path = project_path + '/testfiles/' + device['os_type']
+    # For each yaml file in the config file
     for test_case in test_list:
+        # Open test yml file and gather command output:
         with open(test_path + '/' + test_case) as _f:
             test_values = yaml.load(_f.read())
         before_cmd = device['output']['before'][test_values[0]['command']]
@@ -62,9 +64,12 @@ def execute_diff(device, test_values, before, after):
                             pass_status = 'PASS'
                         after.remove(pos_match)
                         break
-            # If it didnt find a match, mark as failed
+
+            # If testing didn't find a match, mark as failed
             if pass_status == 'UNSET':
                 pass_status = 'FAIL'
+
+            # Print status message:
             if pass_status == 'FAIL':
                 totals['FAIL'] += 1
                 msg = jinja2.Template(str(test_values[0]['tests'][0]['err']))
@@ -78,6 +83,8 @@ def execute_diff(device, test_values, before, after):
                     if after_line == '':
                         after_line = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
                     print msg.render(device=device, pre=line, post=after_line)
+    
+    # Entries in the "AFTER" that aren't in the "BEFORE"
     if len(after) > 0:
         for after_line in after:
             skip_line = False
@@ -91,6 +98,8 @@ def execute_diff(device, test_values, before, after):
                 msg = jinja2.Template(str(test_values[0]['tests'][0]['err']))
                 #print msg.render(device=device, pre=line, post=after_line)
                 print 'FAILED! ISIS adj to ' + after_line[1] + ' on ' + after_line[0] + ' is now ' + after_line[3]
+
+    # Command test results for all lines:
     if totals['FAIL'] == 0:
         print("PASS! All " + totals['PASS'] + " tests passed!")
     else:

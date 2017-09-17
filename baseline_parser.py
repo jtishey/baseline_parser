@@ -97,15 +97,7 @@ for i, item in enumerate(before_files):
 
     # Extract commands & output
     device['output'] = the_extractorator.run(device)
-#    if device['os_type'] == 'IOS':
-#        print "BEFORE OUTPUT:"
-#        print device['output']['before']['show isis neighbor']
-#        print '=====================\n'
-#        print "AFTER OUTPUT:"
-#        print device['output']['after']['show isis neighbor']
-#        print '====================='
 
     # Compare command output
-    results = the_differentiator.run(device)
-
-# Step 5: Do some shit with the results
+    if device['output'] != '':
+        results = the_differentiator.run(device)

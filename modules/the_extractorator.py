@@ -9,20 +9,15 @@ def run(device):
     """ Get device and baselines """
     if device['os_type'] == 'JUNOS':
         prompt = 'deip@' + device['hostname']
-        output = extract(device, prompt)
-        return output
     elif device['os_type'] == 'IOS':
         prompt = device['hostname'] + '#'
-        output = extract(device, prompt)
-        return output
     elif device['os_type'] == 'xr':
-        prompt = 'RP/0/RP0/CPU0:' + device['hostname'] + '#'
-        output = extract(device, prompt)
-        return output
+        prompt = 'RP/0/RP0/CPU0:' + device['hostname'] + '#'    
     else:
         print("ERROR: Device OS not found or not yet supported")
         return ""
-
+    output = extract(device, prompt)
+    return output
 
 # Step 3: Split into individual commands
 def extract(device, prompt):
@@ -54,4 +49,3 @@ def extract(device, prompt):
         else:
             output['after'] =  commands
     return output
-
