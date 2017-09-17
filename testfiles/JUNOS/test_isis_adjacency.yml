@@ -6,5 +6,5 @@
   blacklist: [Interface]
   tests:
     - no-diff: [0,1,3]
-      info: "PASSED!"
-      err: "FAILED!"
+      info: "PASSED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} is still {{ pre[3] }}"
+      err: "FAILED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} failed check"
