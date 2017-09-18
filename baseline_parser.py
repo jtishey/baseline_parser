@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 This is a script to try any parse and compare info from
-The Baseliner script in a managable fashon.
+a baseliner script in a managable fashon.
 John.Tishey@windstream.com 2017
 """
 
@@ -18,7 +18,7 @@ def arguments():
     parser.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
     parser.add_argument('-a', '--after', help='Keyword to identify "After" files (defautl=after)', required=False)
     parser.add_argument('-b', '--before', help='Keyword to identify "Before" files (defautl=before)', required=False)
-    parser.add_argument('-v', '--verbose', action='count', default=0)
+    parser.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(parser.parse_args())
     verbose = False
     tag1 = 'before'

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-baseline_compare module to compare command output from Pinky_baseliner
+baseline_compare module to compare command output from baselines
 john.tishey@windstream.com 2017
 """
 
@@ -8,7 +8,7 @@ import os
 from modules import jinja2
 from modules import yaml
 
-# Step 1: Loop through commands, using pre-determined logic where available
+# Step 1: Loop open config file and get testfile(s)
 def run(device):
     """ Compare output of commands according to test rules
         device['output']['before'] and device['output']['after'] contain the outputs """
@@ -17,9 +17,9 @@ def run(device):
         config = yaml.load(_f)
     test_list = config[(device['os_type'])]
     test_path = project_path + '/testfiles/' + device['os_type']
-    # For each yaml file in the config file
+    # For each yaml file in the config file:
     for test_case in test_list:
-        # Open test yml file and gather command output:
+        # Open testfile and gather command output:
         with open(test_path + '/' + test_case) as _f:
             test_values = yaml.load(_f.read())
         before_cmd = device['output']['before'][test_values[0]['command']]
@@ -30,7 +30,7 @@ def run(device):
 
 def execute_diff(device, test_values, before, after):
     """ Gets before/after command and yaml test values to compare """
-    # First, determine the test from test_values:
+    # Reset totals and variables
     totals = {'PASS': 0, 'FAIL': 0}
     for line in before[:]:
         pass_status = 'UNSET'
@@ -45,7 +45,7 @@ def execute_diff(device, test_values, before, after):
             if test_values[0]['iterate'] not in line:
                 skip_line = True
         if skip_line is not True:
-            # For no-diff tests, loop through lines in after
+            # For no-diff tests, loop through lines in after to find a match
             if 'no-diff' in test_values[0]['tests'][0]:
                 line = line.split()
                 line_id = test_values[0]['tests'][0]['no-diff'][0]
@@ -93,13 +93,13 @@ def execute_diff(device, test_values, before, after):
                     skip_line = True
             if skip_line is False:
                 totals['FAIL'] += 1
-                after_line = after_line.split()
-                line = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
+                line = after_line.split()
+                after_line = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
                 msg = jinja2.Template(str(test_values[0]['tests'][0]['err']))
-                #print msg.render(device=device, pre=line, post=after_line)
-                print 'FAILED! ISIS adj to ' + after_line[1] + ' on ' + after_line[0] + ' is now ' + after_line[3]
+                print msg.render(device=device, pre=line, post=after_line)
+                #print 'FAILED! ISIS adj to ' + after_line[1] + ' on ' + after_line[0] + ' is now ' + after_line[3]
 
-    # Command test results for all lines:
+    # Print command test results for all lines:
     if totals['FAIL'] == 0:
         print("PASS! All " + totals['PASS'] + " tests passed!")
     else:
