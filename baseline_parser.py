@@ -110,8 +110,8 @@ for i, item in enumerate(CONFIG.before_files):
     device.assign_values(hostname, i)
 
     """ Get commands and output from baseline files """
-    print "\n\nRunning " + device.hostname
-    print "-" * 24
+    print "\nRunning " + device.hostname
+    print "-" * 16
     device.output = the_extractorator.run(device)
 
     """ Execute the diff on the command output """

@@ -2,7 +2,7 @@
 - show_isis_adjacency:
   command:  show isis adjacency
   ignore-null: False
-  iterate: [all]
+  iterate: all
   blacklist: [Interface]
   tests:
     - no-diff: [0,1,3]

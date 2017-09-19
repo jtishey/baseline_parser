@@ -12,7 +12,7 @@ def run(device):
     elif device.os_type == 'IOS':
         prompt = device.hostname + '#'
     elif device.os_type == 'XR':
-        prompt = 'RP/0/RSP0/CPU0:' + device.hostname + '#'    
+        prompt = 'RP/0/RP0/CPU0:' + device.hostname + '#'    
     else:
         print("ERROR: Device OS not found or not yet supported")
         return ""
