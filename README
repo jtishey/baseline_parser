@@ -1,0 +1,77 @@
+
+!!! STILL EARLY DEVELOPMENT !!!
+
+ baseline_parser.py
+###################
+
+ Example usage: /opt/ipeng/scripts/baseline_parser/baseline_parser.py -m 233806
+
+USAGE:
+Required arguments:
+ -m / --mop     -  Specify a MOP number to locate the baseline files for and run checks against
+
+Optional arguments:
+
+ -b / --before  -  Specify a keyword to identify "BEFORE" baseline files (default = before)
+ -a / --after   -  Specify a keyword to identify "AFTER" baseline files (default = after)
+ -v / --verbose -  Display output of PASSED checks as well as FAILED checks (off by default)
+ -h / --help    -  Display CLI syntax help
+
+
+baseline_parser is a script to run tests agains before/after MOP baselines.
+
+Script looks for baseline files based on the MOP number (and optionally before/after keywords)
+It then seperates the commands executed during the baselines to be tested individually and displays
+output based on the results of those tests. 
+
+Currently only JUNOS really has testfiles created, and only no-diff tests are implemented (rough-draft)
+
+
+Creating and Editing Testfiles:
+-------------------------------
+
+testfiles are located in /opt/ipeng/scripts/baseline_parser/testfiles/  in a seperate folder for each OS Type
+(JUNOS / IOS / XR / etc) 
+
+They are YAML files and are currently setup as follows:
+
+---
+- show_isis_adjacency:              < Arbitrary test case name
+  command:  show isis adjacency     < Command to match in the baseline file
+  ignore-null: False                < Make test not fail if there is nothing to match (future)
+  iterate: [all]                    < Lines of command output to iterate on, either [all] or a list of keywords to match in a line
+  blacklist: [Interface, Metric]    < Ignore lines containing these words (comma seperated inside brackets: [ ]
+  tests:
+    - no-diff: [0,1,3]              < Type of test and indexes to match on (only no-diff supported so far)
+      info: "PASSED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} is still {{ pre[3] }}"    < Message to display on PASS
+      err: "FAILED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} failed check"              < Message to display on FAIL
+
+
+Additional Info:
+----------------
+iterate and blacklists are formatted as python lists ex:[value1, value2]
+    A match occurs if any of the keywords appears in the command output.
+    blacklist words can be used to easily ignore headings for example 
+
+no-diff indicates there should be no difference in the indexes specified for before/after
+
+An index specifies a column or word in a line of output.  For example:
+  A line from "show isis adjacency" might look like this:
+  ge-0/0/1.0            pe03.lncl01-ne 2  Up                   28
+
+Each word is numbered, left to right, starting from 0 so:
+ 0 = ge-0/0/1.0
+ 1 = pe03.lncl01-ne
+ 2 = 2
+ 3 = Up
+ 4 = 28
+
+The first index listed after no-diff is used as an identifier to match on.
+In this case, we want to use 0, to run checks based on the interface, so it is specified first.
+
+
+Once a testfile is created, it must be added to config.yml to be run.
+
+  /opt/ipeng/scripts/baseline_parser/config.yml
+
+
