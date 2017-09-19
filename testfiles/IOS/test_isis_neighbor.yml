@@ -2,7 +2,7 @@
 - show_isis_neighbor:
   command:  show isis neighbor
   ignore-null: False
-  iterate: [all]
+  iterate: all
   blacklist: [Tag, Interface]
   tests:
     - no-diff: [1, 0, 3]

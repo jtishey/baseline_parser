@@ -24,7 +24,7 @@ def run(device):
             test_values = yaml.load(_f.read())
         before_cmd = device.output['before'][test_values[0]['command']]
         after_cmd =  device.output['after'][test_values[0]['command']]
-        print("******** Command: " + test_values[0]['command'] + " ********")
+        print("Testing command: " + test_values[0]['command'])
         execute_diff(device, test_values, before_cmd, after_cmd)
 
 
@@ -41,12 +41,8 @@ def execute_diff(device, test_values, before, after):
             if word in line:
                 skip_line = True
         # If an iterator is set, skip lines that don't have the iterator
-        if test_values[0]['iterate'] != ['all']:
-            iter_match = False
-            for word in test_values[0]['iterate']:
-                if word in line:
-                     iter_match = True
-            if iter_match is False:
+        if test_values[0]['iterate'] != 'all':
+            if test_values[0]['iterate'] not in line:
                 skip_line = True
         if skip_line is not True:
             # For no-diff tests, loop through lines in after to find a match
@@ -60,12 +56,9 @@ def execute_diff(device, test_values, before, after):
                     if line[line_id] == after_line[line_id]:
                         for index in test_values[0]['tests'][0]['no-diff']:
                             # If an index fails, mark as failed
-                            try:
-                                if line[index] != after_line[index]:
-                                    pass_status = 'FAIL'
-                                    break
-                            except:
-                                    pass_status = 'FAIL'
+                            if line[index] != after_line[index]:
+                                pass_status = 'FAIL'
+                                break
                         # If it looped through indexes without failing, mark as pass
                         if pass_status == 'UNSET':
                             pass_status = 'PASS'
@@ -98,11 +91,6 @@ def execute_diff(device, test_values, before, after):
             for word in test_values[0]['blacklist']:
                 if word in after_line:
                     skip_line = True
-            # If an iterator is set, skip lines that don't have the iterator
-            if test_values[0]['iterate'] != ['all']:
-                for word in test_values[0]['iterate']:
-                    if word not in after_line:
-                        skip_line = True
             if skip_line is False:
                 totals['FAIL'] += 1
                 line = after_line.split()
@@ -113,7 +101,7 @@ def execute_diff(device, test_values, before, after):
 
     # Print command test results for all lines:
     if totals['FAIL'] == 0:
-        print("PASS! All " + str(totals['PASS']) + " tests passed!\n")
+        print("PASS! All " + str(totals['PASS']) + " tests passed!")
     else:
-        print("FAIL! " + str(totals['PASS']) + " tests passed, " + str(totals['FAIL']) + " tests failed!\n")
+        print("FAIL! " + str(totals['PASS']) + " tests passed, " + str(totals['FAIL']) + " tests failed!")
 
