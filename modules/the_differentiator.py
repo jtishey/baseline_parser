@@ -26,7 +26,59 @@ def run(device):
         after_cmd =  device.output['after'][test_values[0]['command']]
         print("******** Command: " + test_values[0]['command'] + " ********")
         execute_diff(device, test_values, before_cmd, after_cmd)
+    print("******** Testing ping commands ********")
 
+    # Run ping tests:
+    ping_totals = {"PASS": 0, "FAIL": 0, "SKIP": 0}
+    for cmd in device.output['before'].keys():
+        if cmd[:4] == 'ping':
+            try:
+                before_cmd = device.output['before'][cmd]
+                after_cmd =  device.output['after'][cmd]
+            except KeyError, e:
+                ping_totals["SKIP"] +=1
+                continue
+            r = execute_ping_check(device, cmd, before_cmd, after_cmd)
+            ping_totals[r] +=1
+    if ping_totals['FAIL'] == 0:
+        print("PASS! " + str(ping_totals["PASS"]) + " ping checks passed! (" + str(ping_totals["SKIP"]) + " skipped) \n")
+    else:
+        print("FAIL! " + str(ping_totals['PASS']) + " tests passed, " + str(ping_totals['FAIL']) + " tests failed!\n")
+
+
+def execute_ping_check(device, cmd, before, after):
+    """ Test ping commands - no testfile needed """
+    if device.os_type == "XR" or device.os_type == "IOS":
+        iter_word = 'Success'
+        match_index = 3
+    elif device.os_type == "JUNOS" or device.os_type == "TiMOS":
+        iter_word = 'packets'
+        match_index = 6
+
+    found_match = False
+    for line in before:
+        if iter_word in line:
+            line = line.split()
+            found_match = True
+    if found_match is False:
+        return "SKIP"
+    found_match = False
+    for after_line in after:
+        if iter_word in after_line:
+            after_line = after_line.split()
+            found_match = True
+    if found_match is False:
+        return "SKIP"
+    try:
+        if line[match_index] == after_line[match_index]:
+            if device.config.verbose == True:
+                print "PASSED! " + cmd + " " + str(line[match_index]) + '% Success before and after'
+            return "PASS"
+        else:
+            print("FAILED! " + cmd + " pre=" + str(line[match_index]) + "% post=" + str(after_line[match_index]) + "% Success")
+            return "FAIL"
+    except IndexError, e:
+        return "FAIL"
 
 def execute_diff(device, test_values, before, after):
     """ Gets before/after command and yaml test values to compare """
@@ -57,22 +109,25 @@ def execute_diff(device, test_values, before, after):
                     pos_match = after_line
                     after_line = after_line.split()
                     # If the first index matches, check the rest
-                    if line[line_id] == after_line[line_id]:
-                        for index in test_values[0]['tests'][0]['no-diff']:
-                            # If an index fails, mark as failed
-                            try:
-                                if line[index] != after_line[index]:
-                                    pass_status = 'FAIL'
-                                    break
-                            except:
-                                    pass_status = 'FAIL'
-                        # If it looped through indexes without failing, mark as pass
-                        if pass_status == 'UNSET':
-                            pass_status = 'PASS'
-                        after.remove(pos_match)
-                        break
+                    try:
+                        if line[line_id] == after_line[line_id]:
+                            for index in test_values[0]['tests'][0]['no-diff']:
+                                # If an index fails, mark as failed
+                                try:
+                                    if line[index] != after_line[index]:
+                                        pass_status = 'FAIL'
+                                        break
+                                except:
+                                        pass_status = 'FAIL'
+                            # If it looped through indexes without failing, mark as pass
+                            if pass_status == 'UNSET':
+                                pass_status = 'PASS'
+                            after.remove(pos_match)
+                            break
+                    except IndexError, e:
+                        continue
 
-            # If testing didn't find a match, mark as failed
+           # If testing didn't find a match, mark as failed
             if pass_status == 'UNSET':
                 pass_status = 'FAIL'
 
@@ -90,7 +145,7 @@ def execute_diff(device, test_values, before, after):
                     if after_line == '':
                         after_line = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
                     print(msg.render(device=device, pre=line, post=after_line))
-    
+
     # Entries in the "AFTER" that aren't in the "BEFORE"
     if len(after) > 0:
         for after_line in after:
@@ -116,4 +171,3 @@ def execute_diff(device, test_values, before, after):
         print("PASS! All " + str(totals['PASS']) + " tests passed!\n")
     else:
         print("FAIL! " + str(totals['PASS']) + " tests passed, " + str(totals['FAIL']) + " tests failed!\n")
-

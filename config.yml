@@ -10,10 +10,19 @@ JUNOS:
   - test_bgp_summary.yml
 
 IOS:
+  - test_bgp_summary.yaml
   - test_isis_neighbor.yml
+  - test_mpls_interface.yml
+  - test_pim_neighbor.yml
+  - test_rsvp_interface.yml
+  - test_xconnect.yml
 
 XR:
   - test_isis_neighbor.yml
+  - test_interface_brief.yml
+  - test_ldp_interface.yml
+  - test_mpls_interface.yml
+  - test_platform.yml
 
 TiMOS:
   - test_router_isis_adjacency.yml

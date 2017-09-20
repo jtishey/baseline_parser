@@ -1,0 +1,11 @@
+---
+- show_bfd_session:
+  command:  show bfd session
+  ignore-null: False
+  iterate: [UP, DOWN]
+  blacklist: []
+  tests:
+    - no-diff: [0, 4]
+      info: "PASSED! BFD neighbor on {{ pre[0] }} is still {{ pre[4] }}"
+      err: "FAILED! BFD neighbor on {{ pre[0] }} was {{ pre[4] }} and is now {{ post[4] }}"
+
