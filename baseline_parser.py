@@ -61,16 +61,18 @@ class Config(object):
                     found_list.append(os.path.abspath(root + '/' + directory))
         if len(found_list) == 1:
             self.mop_path = found_list[0]
+            print("\nFound " + self.mop_path)
         elif len(found_list) > 1:
             print("\nFound " + str(len(found_list)) + " baselines for MOP " + self.mop_number + ":")
             print("-" * 36)
             for i, mop_folder in enumerate(found_list):
                 print(str(i + 1) + ': ' + mop_folder)
-            selection = raw_input("\n Select a folder to test: ")
-            if selection in ['1','2','3','4','5','6']:
+            selection = raw_input("\nSelect a folder to test: ")
+            print("\n")
+            try:
                 selection = int(selection)
                 self.mop_path = found_list[selection - 1]
-            else:
+            except:
                 print("ERROR: Please enter the number of the selection only\n")
                 exit(1)
         else: 
@@ -86,6 +88,11 @@ class Config(object):
                 self.before_files.append(_file)
             elif f_part[3] == self.after_kw:
                 self.after_files.append(_file)
+
+        if len(self.before_files) == 0 or \
+           len(self.after_files) == 0:
+            print("\nBefore/After files not found\n")
+            exit(1)
         self.before_files.sort()
         self.after_files.sort()
         os.chdir('/opt/ipeng/scripts/baseline_parser/')
@@ -107,8 +114,16 @@ class Device(object):
     def assign_values(self, host, i):
         """ Assign device-specific values """
         self.hostname = host
-        self.files.append(os.path.abspath(self.config.mop_path + '/' + self.config.before_files[i]))
-        self.files.append(os.path.abspath(self.config.mop_path + "/" + self.config.after_files[i]))
+        try:
+            self.files.append(os.path.abspath(self.config.mop_path + '/' + self.config.before_files[i]))
+        except IndexError:
+            print("ERROR: No before baseline found for " + host)
+            exit(1)
+        try:
+            self.files.append(os.path.abspath(self.config.mop_path + "/" + self.config.after_files[i]))
+        except IndexError:
+            print("ERROR: No after baseline found for " + host)
+            exit(1)
         os_type = subprocess.Popen(
             ["gimme", "os_type", host], stdout=subprocess.PIPE).communicate()
         self.os_type = os_type[0].rstrip()
@@ -117,6 +132,7 @@ class Device(object):
 CONFIG = Config()
 CONFIG.folder_search()
 CONFIG.file_search()
+
 
 for i, item in enumerate(CONFIG.before_files):
     hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
@@ -131,5 +147,4 @@ for i, item in enumerate(CONFIG.before_files):
 
     """ Execute the diff on the command output """
     if device.output != '':
-        device.results = the_differentiator.run(device)
-
+        device.results = the_differentiator.Run(device)

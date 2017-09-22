@@ -1,0 +1,10 @@
+---
+- show_active_subscribers:
+  command:  show service active-subscribers summary
+  ignore-null: False
+  iterate: [Total]
+  blacklist: []
+  tests:
+    - no-diff: [0, -1]
+      info: "PASSED! Active subscribers is still {{ pre[-1] }}"
+      err: "FAILED! Active subscribers was {{ pre[-1] }} and is now {{ post[-1] }}"

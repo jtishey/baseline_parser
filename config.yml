@@ -3,14 +3,17 @@ JUNOS:
   - test_ldp_interface.yml
   - test_ldp_neighbor.yml
   - test_ldp_session.yml
+  - test_interfaces_terse.yml
   - test_pim_interfaces.yml
   - test_pim_neighbors.yml
   - test_rsvp_interface.yml
   - test_task_replication.yml
   - test_bgp_summary.yml
+  - test_chassis_fpc.yml
 
 IOS:
-  - test_bgp_summary.yaml
+  - test_bgp_summary.yml
+  - test_interface_brief.yml
   - test_isis_neighbor.yml
   - test_mpls_interface.yml
   - test_pim_neighbor.yml
@@ -18,6 +21,8 @@ IOS:
   - test_xconnect.yml
 
 XR:
+  - test_bfd_session.yml
+  - test_bgp_summary.yml
   - test_isis_neighbor.yml
   - test_interface_brief.yml
   - test_ldp_interface.yml
@@ -25,4 +30,7 @@ XR:
   - test_platform.yml
 
 TiMOS:
+  - test_active_subscribers.yml
+  - test_port.yml
   - test_router_isis_adjacency.yml
+  - test_mpls_interface.yml
