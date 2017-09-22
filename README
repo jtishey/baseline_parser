@@ -24,8 +24,6 @@ Script looks for baseline files based on the MOP number (and optionally before/a
 It then seperates the commands executed during the baselines to be tested individually and displays
 output based on the results of those tests. 
 
-Currently only JUNOS really has testfiles created, and only no-diff tests are implemented (rough-draft)
-
 
 Creating and Editing Testfiles:
 -------------------------------

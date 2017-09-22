@@ -8,6 +8,7 @@ John.Tishey@windstream.com 2017
 import os
 import argparse
 import subprocess
+from modules import yaml
 from modules import the_extractorator
 from modules import the_differentiator
 
@@ -43,10 +44,13 @@ class Config(object):
         self.mop_path = ''
         self.before_files = []
         self.after_files = []
+        with open('config.yml') as _f:
+            self.config_file = yaml.load(_f)
+        
 
     def folder_search(self):
         """ Method to recursivly seach for a folder name """
-        os.chdir('/opt/ipeng/mops/')
+        os.chdir(self.config_file['settings']['baseline_path'])
         found_list = []
         for root, dirnames, filenames in os.walk(u'.'):
             for directory in dirnames:
@@ -88,7 +92,7 @@ class Config(object):
             exit(1)
         self.before_files.sort()
         self.after_files.sort()
-        os.chdir('/opt/ipeng/scripts/baseline_parser/')
+        os.chdir(self.config_file['settings']['proj_path'])
 
 
 class Device(object):
