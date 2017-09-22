@@ -14,27 +14,20 @@ from modules import the_differentiator
 
 def arguments():
     """ Parse entered CLI arguments with argparse """
-    parser = argparse.ArgumentParser(description='Parse and compare before/after Pinky_Baseliner files.')
-    parser.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
-    parser.add_argument('-a', '--after', help='Keyword to identify "After" files (defautl=after)', required=False)
-    parser.add_argument('-b', '--before', help='Keyword to identify "Before" files (defautl=before)', required=False)
-    parser.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
-    args = vars(parser.parse_args())
-    verbose = False
-    tag1 = 'before'
-    tag2 = 'after'
-
-    if args['mop']:
-        mop = args['mop']
+    p = argparse.ArgumentParser(description='Parse and compare before/after Pinky_Baseliner files.')
+    p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
+    p.add_argument('-a', '--after', help='Keyword to identify "After" files (defautl=after)', required=False)
+    p.add_argument('-b', '--before', help='Keyword to identify "Before" files (defautl=before)', required=False)
+    p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
+    args = vars(p.parse_args())
+    tag1, tag2, verbose = 'before', 'after', False 
+    mop = args['mop']
     if args['verbose']:
         verbose = True
     if args['before']:
         tag1 = args['before']
     if args['after']:
         tag2 = args['after']
-    if mop == '':
-        print("ERROR: Please enter a valid MOP number.  Use --help for usage info.")
-        exit(1)
     return mop, tag1, tag2, verbose
 
 
@@ -108,9 +101,6 @@ class Device(object):
         self.output = []
         self.results = ''
 
-    def __get_attr__(self):
-        return getattr(self.before_files)
-
     def assign_values(self, host, i):
         """ Assign device-specific values """
         self.hostname = host
@@ -147,4 +137,4 @@ for i, item in enumerate(CONFIG.before_files):
 
     """ Execute the diff on the command output """
     if device.output != '':
-        device.results = the_differentiator.Run(device)
+        the_differentiator.Run(device)
