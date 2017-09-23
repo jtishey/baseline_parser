@@ -10,6 +10,7 @@ import sys
 import logging
 import argparse
 import subprocess
+from modules import yaml
 from modules import the_extractorator
 from modules import the_differentiator
 
@@ -42,18 +43,15 @@ class Config(object):
     """ Variables used by all devices """
     def __init__(self):
         """ Init variables """
-        mop_number, before_kw, after_kw, verbose = arguments()
-        self.mop_number = mop_number
-        self.before_kw = before_kw
-        self.after_kw = after_kw
-        self.verbose = verbose
-        self.mop_path = ''
+        self.mop_number, self.before_kw, self.after_kw, self.verbose = arguments()
+        with open('config.yml') as _f:
+            self.cfg = yaml.load(_f)
         self.before_files = []
         self.after_files = []
 
     def folder_search(self):
         """ Method to recursivly seach for a folder name """
-        os.chdir('/opt/ipeng/mops/')
+        os.chdir(self.cfg['mop_path'])
         found_list = []
         for root, dirnames, filenames in os.walk(u'.'):
             for directory in dirnames:
@@ -99,7 +97,7 @@ class Config(object):
             exit(1)
         self.before_files.sort()
         self.after_files.sort()
-        os.chdir('/opt/ipeng/scripts/baseline_parser/')
+        os.chdir(self.cfg['project_path'])
 
     def setup_logging(self):
         msg_only_formatter = logging.Formatter('%(message)s')

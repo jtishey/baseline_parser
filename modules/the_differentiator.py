@@ -16,11 +16,8 @@ class Run(object):
         """ Compare output of commands according to test rules
         device.output['before'] and device.output['after'] contain the outputs """
         self.device = device
-        project_path = os.path.abspath('/opt/ipeng/scripts/baseline_parser/')
-        with open(project_path + '/config.yml') as _f:
-            config = yaml.load(_f)
-        self.test_list = config[(self.device.os_type)]
-        self.test_path = project_path + '/testfiles/' + self.device.os_type
+        self.test_list = self.device.config.cfg[(self.device.os_type)]
+        self.test_path = self.device.config.cfg['project_path'] + '/testfiles/' + self.device.os_type
 
         if self.device.config.verbose  == 20:
             self.config_diff()

@@ -1,3 +1,6 @@
+project_path: /opt/ipeng/scripts/baseline_parser/
+mop_path: /opt/ipeng/mops/
+
 JUNOS:
   - test_isis_adjacency.yml
   - test_ldp_interface.yml
