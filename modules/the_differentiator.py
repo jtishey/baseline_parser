@@ -16,8 +16,10 @@ class Run(object):
         device.output['before'] and device.output['after'] contain the outputs """
         self.device = device
         self.test_list = self.device.config.cfg[(self.device.os_type)]
-        self.test_path = self.device.config.cfg['project_path'] + '/testfiles/' + self.device.os_type
-
+        self.test_path = self.device.config.cfg['project_path'] + '/testfiles/' + \
+                         self.device.os_type
+        self.pre, self.post = '', ''
+        self.pass_status, self.cmd_totals = '', ''
         if self.device.config.verbose == 20:
             self.config_diff()
             return
@@ -37,8 +39,8 @@ class Run(object):
                 logger.error("ERROR: Could not load " + self.test_path + '/' + test_case)
                 continue
             try:
-                self.before_cmd_output = self.device.output['before'][self.test_values[0]['command']]
-                self.after_cmd_output = self.device.output['after'][self.test_values[0]['command']]
+                self.before_cmd_output = self.device.output['before'][(self.test_values[0]['command'])]
+                self.after_cmd_output = self.device.output['after'][(self.test_values[0]['command'])]
             except KeyError:
                 logger.error("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
                 continue
@@ -50,6 +52,7 @@ class Run(object):
         logger = logging.getLogger("BaselineParser")
         logger.info("******** Command: " + self.test_values[0]['command'] + " ********")
         self.cmd_totals = {'PASS': 0, 'FAIL': 0}
+        line = ''
         for line in self.before_cmd_output:
             self.pass_status = 'UNSET'
             skip_line = False
@@ -216,6 +219,7 @@ class Run(object):
         match_index = ping_vars[self.device.os_type]['match_index']
         # Look for the results line in the BEFORE
         found_match = False
+        line, after_line = '', ''
         for line in self.before_cmd_output:
             if iterword in line:
                 line = line.split()
