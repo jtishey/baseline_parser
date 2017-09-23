@@ -81,11 +81,11 @@ class Run(object):
     def no_diff(self, line):
         """ Execute no-diff tests (indicating all indexes match before/after)"""
         line = line.split()
+        after_line = ''
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
         for after_line in self.after_cmd_output:
             after_line_orig = after_line
             after_line = after_line.split()
-            # If the first index matches, check the rest
             try:
                 if line[line_id] == after_line[line_id]:
                     for index in self.test_values[0]['tests'][0]['no-diff']:

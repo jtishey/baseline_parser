@@ -5,6 +5,6 @@
   iterate: [all]
   blacklist: ['Peer', '----', 'UTC']
   tests:
-    - no-diff: [0, 5]
-      info: "PASSED! {{ pre[0] }} is still has {{ pre[5] }} addresses"
-      err: "FAILED! {{ pre[0] }} changed from {{ pre[5] }} addresses to {{ post[5] }} addresses"
+    - no-diff: [0, -2]
+      info: "PASSED! {{ pre[0] }} is still has {{ pre[-2] }} addresses"
+      err: "FAILED! {{ pre[0] }} changed from {{ pre[-2] }} addresses to {{ post[-2] }} addresses"
