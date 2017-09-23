@@ -271,5 +271,6 @@ class Run(object):
         logger.warn(self.device.hostname + ' totals - PASSED: ' + str(passed) + \
                     ' FAILED: ' + str(failed) + "\n" + ('*' * 46))
         for test in failed_list:
-            logger.warn("  Failed - " + str(test))
+            fail_cnt = self.summary[test]['FAIL']
+            logger.warn("  Failed - " + str(fail_cnt) + ' lines - ' + str(test))
         logger.warn("\n")
