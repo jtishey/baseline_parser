@@ -34,7 +34,6 @@ XR:
   - test_ldp_interface.yml
   - test_ldp_neighbor.yml
   - test_mpls_interface.yml
-  - test_ping_checks.yml
   - test_platform.yml
   - test_redundancy.yml
 
