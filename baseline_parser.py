@@ -24,6 +24,7 @@ def arguments():
                    help='Keyword to identify "Before" files (default=before)')
     p.add_argument('-c', '--config',  action='count', default=0,
                    help='Display configuration diff only')
+    p.add_argument('-s', '--summary', action='count', default=0, help='Display summary output only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
     verbose, tag1, tag2 = 0, 'before', 'after'
@@ -36,6 +37,8 @@ def arguments():
         tag2 = args['after']
     if  args['config']:
         verbose = 20
+    if args['summary']:
+        verbose = 40
     return mop, tag1, tag2, verbose
 
 
@@ -114,7 +117,9 @@ class Config(object):
         # Stream Handler:
         sh = logging.StreamHandler(sys.stdout)
         sh.setFormatter(msg_only_formatter)
-        if self.verbose > 0:
+        if self.verbose == 40:
+            sh.setLevel(logging.WARN)
+        elif self.verbose > 0:
             sh.setLevel(logging.DEBUG)
         else:
             sh.setLevel(logging.INFO)
