@@ -2,35 +2,41 @@ project_path: /opt/ipeng/scripts/baseline_parser/
 mop_path: /opt/ipeng/mops/
 
 JUNOS:
+  - test_bgp_summary.yml
+  - test_chassis_fpc.yml
+  - test_interfaces_terse.yml
   - test_isis_adjacency.yml
   - test_ldp_interface.yml
   - test_ldp_neighbor.yml
   - test_ldp_session.yml
-  - test_interfaces_terse.yml
   - test_pim_interfaces.yml
   - test_pim_neighbors.yml
   - test_rsvp_interface.yml
   - test_task_replication.yml
-  - test_bgp_summary.yml
-  - test_chassis_fpc.yml
 
 IOS:
+  - test_bfd_neighbor.yml
   - test_bgp_summary.yml
   - test_interface_brief.yml
   - test_isis_neighbor.yml
+  - test_module.yml
   - test_mpls_interface.yml
   - test_pim_neighbor.yml
+  - test_redundancy.yml
   - test_rsvp_interface.yml
   - test_xconnect.yml
 
 XR:
   - test_bfd_session.yml
   - test_bgp_summary.yml
-  - test_isis_neighbor.yml
   - test_interface_brief.yml
+  - test_isis_neighbor.yml
   - test_ldp_interface.yml
+  - test_ldp_neighbor.yml
   - test_mpls_interface.yml
+  - test_ping_checks.yml
   - test_platform.yml
+  - test_redundancy.yml
 
 TiMOS:
   - test_active_subscribers.yml

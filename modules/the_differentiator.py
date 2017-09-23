@@ -4,7 +4,6 @@ baseline_compare module to compare command output from baselines
 john.tishey@windstream.com 2017
 """
 
-import os
 import difflib
 import logging
 from modules import jinja2
@@ -19,7 +18,7 @@ class Run(object):
         self.test_list = self.device.config.cfg[(self.device.os_type)]
         self.test_path = self.device.config.cfg['project_path'] + '/testfiles/' + self.device.os_type
 
-        if self.device.config.verbose  == 20:
+        if self.device.config.verbose == 20:
             self.config_diff()
             return
 
@@ -29,7 +28,7 @@ class Run(object):
 
     def get_command_lists(self):
         """ For each yaml file in the config file, open testfile and gather command output. """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         for test_case in self.test_list:
             try:
                 with open(self.test_path + '/' + test_case) as _f:
@@ -40,7 +39,7 @@ class Run(object):
             try:
                 self.before_cmd_output = self.device.output['before'][self.test_values[0]['command']]
                 self.after_cmd_output = self.device.output['after'][self.test_values[0]['command']]
-            except KeyError, e:
+            except KeyError:
                 logger.error("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
                 continue
             self.test_cmd_output()
@@ -48,7 +47,7 @@ class Run(object):
     def test_cmd_output(self):
         """ Gets before/after command and yaml test values to compare """
         # Reset totals and variables
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         logger.info("******** Command: " + self.test_values[0]['command'] + " ********")
         self.cmd_totals = {'PASS': 0, 'FAIL': 0}
         for line in self.before_cmd_output:
@@ -65,7 +64,7 @@ class Run(object):
                     if word in line:
                         iter_match = True
                 if iter_match is False:
-                     skip_line = True
+                    skip_line = True
             if skip_line is True:
                 continue
             # NO-DIFF =  All indexes must match before/after
@@ -109,23 +108,23 @@ class Run(object):
 
     def print_result(self):
         """ Print and count the results """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         if self.pass_status == 'FAIL':
             self.cmd_totals['FAIL'] += 1
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
             if self.post == '' or self.post == []:
-                self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
+                self.post = ['null'] * 12
             logger.info(msg.render(device=self.device, pre=self.pre, post=self.post))
         else:
             self.cmd_totals['PASS'] += 1
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['info']))
             if self.post == '':
-                self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null']
-            logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post)) 
+                self.post = ['null'] * 12
+            logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post))
 
     def after_only_lines(self):
         """ Account for lines in AFTER that aren't in BEFORE """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         if len(self.after_cmd_output) > 0:
             for after_line in self.after_cmd_output:
                 skip_line = False
@@ -146,7 +145,7 @@ class Run(object):
 
     def print_totals(self):
         """ Print command test results for all lines of that command output """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         if self.cmd_totals['FAIL'] == 0:
             logger.info("PASS! All " + str(self.cmd_totals['PASS']) + " tests passed!\n")
         else:
@@ -155,7 +154,7 @@ class Run(object):
 
     def config_diff(self):
         """ Run diff on before and after config """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         cmds = {'JUNOS': 'show configuration',
                 'IOS': 'show run',
                 'XR': 'show configuration running-config',
@@ -186,7 +185,7 @@ class Run(object):
 
     def test_ping_output(self):
         """ Run ping tests """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         logger.info("******** Testing ping commands ********")
         self.ping_totals = {"PASS": 0, "FAIL": 0, "SKIP": 0}
         for self.ping_test in self.device.output['before'].keys():
@@ -194,7 +193,7 @@ class Run(object):
                 try:
                     self.before_cmd_output = self.device.output['before'][self.ping_test]
                     self.after_cmd_output = self.device.output['after'][self.ping_test]
-                except KeyError, e:
+                except KeyError:
                     self.ping_totals["SKIP"] += 1
                     continue
                 self.execute_ping_check()
@@ -208,7 +207,7 @@ class Run(object):
 
     def execute_ping_check(self):
         """ Test ping commands - no testfile needed """
-        logger = logging.getLogger("BaselineParser") 
+        logger = logging.getLogger("BaselineParser")
         ping_vars = {'JUNOS': {'iterword': 'packets', 'match_index': 6},
                      'TiMOS': {'iterword': 'packets', 'match_index': 6},
                      'IOS': {'iterword': 'Success', 'match_index': 3},
