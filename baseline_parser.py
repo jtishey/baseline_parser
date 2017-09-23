@@ -20,14 +20,13 @@ def arguments():
     p = argparse.ArgumentParser(description='Parse and compare before/after baseline files.')
     p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
     p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)')
-    p.add_argument('-b', '--before',
-                   help='Keyword to identify "Before" files (default=before)')
-    p.add_argument('-c', '--config',  action='count', default=0,
-                   help='Display configuration diff only')
-    p.add_argument('-s', '--summary', action='count', default=0, help='Display summary output only')
+    p.add_argument('-b', '--before', help='Keyword to identify "Before" files (default=before)')
+    p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only')
+    p.add_argument('-c', '--conf', action='count', default=0, help='Display configuration diff only')
+    p.add_argument('-s', '--summ', action='count', default=0, help='Display summary output only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    verbose, tag1, tag2 = 0, 'before', 'after'
+    verbose, tag1, tag2, stest = 0, 'before', 'after', ''
     mop = args['mop']
     if args['verbose']:
         verbose = args['verbose']
@@ -39,14 +38,16 @@ def arguments():
         verbose = 20
     if args['summary']:
         verbose = 40
-    return mop, tag1, tag2, verbose
+    if args['device']:
+        stest = args['device']
+    return mop, tag1, tag2, stest, verbose
 
 
 class Config(object):
     """ Variables used by all devices """
     def __init__(self):
         """ Init variables """
-        self.mop_number, self.before_kw, self.after_kw, self.verbose = arguments()
+        self.mop_number, self.before_kw, self.after_kw, self.stest, self.verbose = arguments()
         proj_path = os.path.dirname(os.path.abspath(__file__))
         with open(proj_path + '/config.yml') as _f:
             self.cfg = yaml.load(_f)
@@ -167,6 +168,8 @@ logger = CONFIG.logger
 
 for i, item in enumerate(CONFIG.before_files):
     hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
+    if CONFIG.stest != '' and hostname!= CONFIG.stest:
+        continue
     device = Device()
     device.config = CONFIG
     device.assign_values(hostname, i)

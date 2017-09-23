@@ -39,13 +39,13 @@ class Run(object):
                 with open(self.test_path + '/' + test_case) as _f:
                     self.test_values = yaml.load(_f.read())
             except:
-                logger.error("ERROR: Could not load " + self.test_path + '/' + test_case)
+                logger.info("ERROR: Could not load " + self.test_path + '/' + test_case)
                 continue
             try:
                 self.before_cmd_output = self.device.output['before'][(self.test_values[0]['command'])]
                 self.after_cmd_output = self.device.output['after'][(self.test_values[0]['command'])]
             except KeyError:
-                logger.error("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
+                logger.info("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
                 continue
             self.test_cmd_output()
 
@@ -170,7 +170,7 @@ class Run(object):
             before_cfg = self.device.output['before'][(cmds[self.device.os_type])]
             after_cfg = self.device.output['after'][(cmds[self.device.os_type])]
         except KeyError:
-            logger.error("ERROR: " + (cmds[self.device.os_type] + " not found in baseline\n"))
+            logger.info("ERROR: " + (cmds[self.device.os_type] + " not found in baseline\n"))
             return
 
         diff = difflib.unified_diff(before_cfg, after_cfg)
@@ -268,8 +268,8 @@ class Run(object):
             if self.summary[command]['FAIL'] > 0:
                 failed += 1
                 failed_list.append(command)
-        logger.warn(self.device.hostname + ' totals - PASSED: ' + str(passed) + \
-                    ' FAILED: ' + str(failed) + "\n" + ('*' * 46))
+        logger.warn(self.device.hostname + ' totals: \n'+ ('*' * 46) + '\n' + \
+                    '  PASSED: ' + str(passed) + ' FAILED: ' + str(failed))
         for test in failed_list:
             fail_cnt = self.summary[test]['FAIL']
             logger.warn("  Failed - " + str(fail_cnt) + ' lines - ' + str(test))
