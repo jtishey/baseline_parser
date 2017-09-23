@@ -6,29 +6,35 @@ John.Tishey@windstream.com 2017
 """
 
 import os
+import sys
+import logging
 import argparse
 import subprocess
-from modules import yaml
 from modules import the_extractorator
 from modules import the_differentiator
 
 
 def arguments():
     """ Parse entered CLI arguments with argparse """
-    p = argparse.ArgumentParser(description='Parse and compare before/after Pinky_Baseliner files.')
+    p = argparse.ArgumentParser(description='Parse and compare before/after baseline files.')
     p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
-    p.add_argument('-a', '--after', help='Keyword to identify "After" files (defautl=after)', required=False)
-    p.add_argument('-b', '--before', help='Keyword to identify "Before" files (defautl=before)', required=False)
+    p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)')
+    p.add_argument('-b', '--before',
+                    help='Keyword to identify "Before" files (default=before)')
+    p.add_argument('-c', '--config',  action='count', default=0, 
+                    help='Display configuration diff only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    tag1, tag2, verbose = 'before', 'after', False 
+    verbose, tag1, tag2 = 0, 'before', 'after'
     mop = args['mop']
     if args['verbose']:
-        verbose = True
+        verbose = args['verbose']
     if args['before']:
         tag1 = args['before']
     if args['after']:
         tag2 = args['after']
+    if  args['config']:
+        verbose = 20
     return mop, tag1, tag2, verbose
 
 
@@ -44,13 +50,10 @@ class Config(object):
         self.mop_path = ''
         self.before_files = []
         self.after_files = []
-        with open('config.yml') as _f:
-            self.config_file = yaml.load(_f)
-        
 
     def folder_search(self):
         """ Method to recursivly seach for a folder name """
-        os.chdir(self.config_file['settings']['baseline_path'])
+        os.chdir('/opt/ipeng/mops/')
         found_list = []
         for root, dirnames, filenames in os.walk(u'.'):
             for directory in dirnames:
@@ -60,7 +63,8 @@ class Config(object):
             self.mop_path = found_list[0]
             print("\nFound " + self.mop_path)
         elif len(found_list) > 1:
-            print("\nFound " + str(len(found_list)) + " baselines for MOP " + self.mop_number + ":")
+            print("\nFound " + str(len(found_list)) + " baselines for MOP " + \
+                  self.mop_number + ":")
             print("-" * 36)
             for i, mop_folder in enumerate(found_list):
                 print(str(i + 1) + ': ' + mop_folder)
@@ -81,10 +85,13 @@ class Config(object):
         file_list = os.listdir(self.mop_path)
         for _file in file_list:
             f_part = _file.split('.')
-            if f_part[3] == self.before_kw:
-                self.before_files.append(_file)
-            elif f_part[3] == self.after_kw:
-                self.after_files.append(_file)
+            try:
+                if f_part[3] == self.before_kw:
+                    self.before_files.append(_file)
+                elif f_part[3] == self.after_kw:
+                    self.after_files.append(_file)
+            except:
+                continue
 
         if len(self.before_files) == 0 or \
            len(self.after_files) == 0:
@@ -92,7 +99,28 @@ class Config(object):
             exit(1)
         self.before_files.sort()
         self.after_files.sort()
-        os.chdir(self.config_file['settings']['proj_path'])
+        os.chdir('/opt/ipeng/scripts/baseline_parser/')
+
+    def setup_logging(self):
+        msg_only_formatter = logging.Formatter('%(message)s')
+        detail_formatter = logging.Formatter('%(asctime)s - %(message)s')
+        
+        self.logger = logging.getLogger("BaselineParser")
+        self.logger.setLevel(logging.DEBUG)
+        # File Handler:
+        fh = logging.FileHandler(self.mop_path + '/' + "BaselineParser.log")
+        fh.setFormatter(detail_formatter)
+        fh.setLevel(logging.DEBUG)
+        # Stream Handler:
+        sh = logging.StreamHandler(sys.stdout)
+        sh.setFormatter(msg_only_formatter)
+        if self.verbose > 0:
+            sh.setLevel(logging.DEBUG)
+        else:
+            sh.setLevel(logging.INFO)
+        
+        self.logger.addHandler(fh)
+        self.logger.addHandler(sh)
 
 
 class Device(object):
@@ -109,12 +137,14 @@ class Device(object):
         """ Assign device-specific values """
         self.hostname = host
         try:
-            self.files.append(os.path.abspath(self.config.mop_path + '/' + self.config.before_files[i]))
+            self.files.append(os.path.abspath(self.config.mop_path + '/' + \
+                              self.config.before_files[i]))
         except IndexError:
             print("ERROR: No before baseline found for " + host)
             exit(1)
         try:
-            self.files.append(os.path.abspath(self.config.mop_path + "/" + self.config.after_files[i]))
+            self.files.append(os.path.abspath(self.config.mop_path + "/" + \
+                              self.config.after_files[i]))
         except IndexError:
             print("ERROR: No after baseline found for " + host)
             exit(1)
@@ -126,7 +156,8 @@ class Device(object):
 CONFIG = Config()
 CONFIG.folder_search()
 CONFIG.file_search()
-
+CONFIG.setup_logging()
+logger = CONFIG.logger
 
 for i, item in enumerate(CONFIG.before_files):
     hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
@@ -135,10 +166,10 @@ for i, item in enumerate(CONFIG.before_files):
     device.assign_values(hostname, i)
 
     """ Get commands and output from baseline files """
-    print "\n\nRunning " + device.hostname
-    print "-" * 24
+    logger.info("\n\nRunning " + device.hostname)
+    logger.info("-" * 24)
     device.output = the_extractorator.run(device)
 
     """ Execute the diff on the command output """
     if device.output != '':
-        the_differentiator.Run(device)
+        device.results = the_differentiator.Run(device)

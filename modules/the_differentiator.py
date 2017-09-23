@@ -5,6 +5,8 @@ john.tishey@windstream.com 2017
 """
 
 import os
+import difflib
+import logging
 from modules import jinja2
 from modules import yaml
 
@@ -14,33 +16,43 @@ class Run(object):
         """ Compare output of commands according to test rules
         device.output['before'] and device.output['after'] contain the outputs """
         self.device = device
-        conf = self.device.config.config_file
-        self.test_list = conf[(self.device.os_type)]
-        self.test_path = conf['settings']['proj_path'] + '/testfiles/' + self.device.os_type
+        project_path = os.path.abspath('/opt/ipeng/scripts/baseline_parser/')
+        with open(project_path + '/config.yml') as _f:
+            config = yaml.load(_f)
+        self.test_list = config[(self.device.os_type)]
+        self.test_path = project_path + '/testfiles/' + self.device.os_type
+
+        if self.device.config.verbose  == 20:
+            self.config_diff()
+            return
+
         self.get_command_lists()
+        self.config_diff()
         self.test_ping_output()
 
     def get_command_lists(self):
         """ For each yaml file in the config file, open testfile and gather command output. """
+        logger = logging.getLogger("BaselineParser") 
         for test_case in self.test_list:
             try:
                 with open(self.test_path + '/' + test_case) as _f:
                     self.test_values = yaml.load(_f.read())
             except:
-                print("ERROR: Could not load " + self.test_path + '/' + test_case)
+                logger.error("ERROR: Could not load " + self.test_path + '/' + test_case)
                 continue
             try:
                 self.before_cmd_output = self.device.output['before'][self.test_values[0]['command']]
                 self.after_cmd_output = self.device.output['after'][self.test_values[0]['command']]
             except KeyError, e:
-                print("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
+                logger.error("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
                 continue
             self.test_cmd_output()
 
     def test_cmd_output(self):
         """ Gets before/after command and yaml test values to compare """
-    #     # Reset totals and variables
-        print("******** Command: " + self.test_values[0]['command'] + " ********")
+        # Reset totals and variables
+        logger = logging.getLogger("BaselineParser") 
+        logger.info("******** Command: " + self.test_values[0]['command'] + " ********")
         self.cmd_totals = {'PASS': 0, 'FAIL': 0}
         for line in self.before_cmd_output:
             self.pass_status = 'UNSET'
@@ -100,22 +112,23 @@ class Run(object):
 
     def print_result(self):
         """ Print and count the results """
+        logger = logging.getLogger("BaselineParser") 
         if self.pass_status == 'FAIL':
             self.cmd_totals['FAIL'] += 1
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
             if self.post == '' or self.post == []:
                 self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
-            print(msg.render(device=self.device, pre=self.pre, post=self.post))
+            logger.info(msg.render(device=self.device, pre=self.pre, post=self.post))
         else:
             self.cmd_totals['PASS'] += 1
-            if self.device.config.verbose is True:
-                msg = jinja2.Template(str(self.test_values[0]['tests'][0]['info']))
-                if self.post == '':
-                    self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null']
-                print(msg.render(device=self.device, pre=self.pre, post=self.post)) 
+            msg = jinja2.Template(str(self.test_values[0]['tests'][0]['info']))
+            if self.post == '':
+                self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null']
+            logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post)) 
 
     def after_only_lines(self):
         """ Account for lines in AFTER that aren't in BEFORE """
+        logger = logging.getLogger("BaselineParser") 
         if len(self.after_cmd_output) > 0:
             for after_line in self.after_cmd_output:
                 skip_line = False
@@ -132,19 +145,52 @@ class Run(object):
                     self.pre = after_line.split()
                     self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
                     msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
-                    print(msg.render(device=self.device, pre=self.pre, post=self.post))
+                    logger.info(msg.render(device=self.device, pre=self.pre, post=self.post))
 
     def print_totals(self):
         """ Print command test results for all lines of that command output """
+        logger = logging.getLogger("BaselineParser") 
         if self.cmd_totals['FAIL'] == 0:
-            print("PASS! All " + str(self.cmd_totals['PASS']) + " tests passed!\n")
+            logger.info("PASS! All " + str(self.cmd_totals['PASS']) + " tests passed!\n")
         else:
-            print("FAIL! " + str(self.cmd_totals['PASS']) + " tests passed, " + \
+            logger.info("FAIL! " + str(self.cmd_totals['PASS']) + " tests passed, " + \
                   str(self.cmd_totals['FAIL']) + " tests failed!\n")
+
+    def config_diff(self):
+        """ Run diff on before and after config """
+        logger = logging.getLogger("BaselineParser") 
+        cmds = {'JUNOS': 'show configuration',
+                'IOS': 'show run',
+                'XR': 'show configuration running-config',
+                'TiMOS': 'admin display-config'}
+        logger.info("******** Command: " + cmds[self.device.os_type] + " ********")
+        try:
+            before_cfg = self.device.output['before'][(cmds[self.device.os_type])]
+            after_cfg = self.device.output['after'][(cmds[self.device.os_type])]
+        except KeyError:
+            logger.error("ERROR: " + (cmds[self.device.os_type] + " not found in baseline\n"))
+            return
+
+        diff = difflib.unified_diff(before_cfg, after_cfg)
+        cfg_diff = '\n'.join(diff)
+        if cfg_diff != '':
+            if self.device.config.verbose > 0:
+                logger.info("FAILED! " + self.device.hostname + " configuation changed")
+                for line in cfg_diff.splitlines():
+                    if '@@' in line:
+                        line = '=' * 36
+                    if '+++' not in line and '---' not in line and line != '':
+                        logger.debug(line)
+                logger.info('\n')
+            else:
+                logger.info("FAILED! " + self.device.hostname + " configuation changed ('-v' to view)\n")
+        else:
+            logger.info("PASS! No changes in " + self.device.hostname + " configuration\n")
 
     def test_ping_output(self):
         """ Run ping tests """
-        print("******** Testing ping commands ********")
+        logger = logging.getLogger("BaselineParser") 
+        logger.info("******** Testing ping commands ********")
         self.ping_totals = {"PASS": 0, "FAIL": 0, "SKIP": 0}
         for self.ping_test in self.device.output['before'].keys():
             if self.ping_test[:4] == 'ping':
@@ -157,14 +203,15 @@ class Run(object):
                 self.execute_ping_check()
 
         if self.ping_totals['FAIL'] == 0:
-            print("PASS! " + str(self.ping_totals["PASS"]) + " ping checks passed! (" + \
+            logger.info("PASS! " + str(self.ping_totals["PASS"]) + " ping checks passed! (" + \
                   str(self.ping_totals["SKIP"]) + " skipped) \n")
         else:
-            print("FAIL! " + str(self.ping_totals['PASS']) + " tests passed, " + \
+            logger.info("FAIL! " + str(self.ping_totals['PASS']) + " tests passed, " + \
                    str(self.ping_totals['FAIL']) + " tests failed!\n")
 
     def execute_ping_check(self):
         """ Test ping commands - no testfile needed """
+        logger = logging.getLogger("BaselineParser") 
         ping_vars = {'JUNOS': {'iterword': 'packets', 'match_index': 6},
                      'TiMOS': {'iterword': 'packets', 'match_index': 6},
                      'IOS': {'iterword': 'Success', 'match_index': 3},
@@ -189,7 +236,7 @@ class Run(object):
                 found_match = True
                 break
         if found_match is False:
-            print("FAILED! " + self.ping_test + " not found in the after baseline")
+            logger.info("FAILED! " + self.ping_test + " not found in the after baseline")
             self.ping_totals['FAIL'] += 1
             return
         # Standardize output across platforms
@@ -199,11 +246,10 @@ class Run(object):
             success_rate = str(line[match_index])
         # Compare BEFORE and AFTER packet loss results
         if line[match_index] == after_line[match_index]:
-            if self.device.config.verbose is True:
-                print("PASSED! " + self.ping_test + " " + success_rate + \
-                     '% success before and after')
+            logger.debug("PASSED! " + self.ping_test + " " + success_rate + \
+                 '% success before and after')
             self.ping_totals['PASS'] += 1
         else:
-            print("FAILED! " + self.ping_test  + " pre=" + \
+            logger.info("FAILED! " + self.ping_test  + " pre=" + \
                str(line[match_index]) + "% post=" + str(after_line[match_index]) + "% success")
             self.ping_totals['FAIL'] += 1

@@ -1,0 +1,10 @@
+---
+- show_module:
+  command: show mod
+  ignore-null: False
+  iterate: [all]
+  blacklist: ['Mod', '----', 'OK', 'Ok', '.', 'Pass', 'Fail']
+  tests:
+    - no-diff: [0, -2]
+      info: "PASSED! Slot {{ pre[0] }} still has a {{ pre[-2] }}"
+      err: "FAILED! Slot {{ pre[0] }} was {{ pre[-2] }} and is now {{ post[-2] }}"

@@ -1,9 +1,3 @@
----
-settings:
-  proj_path: /opt/ipeng/scripts/baseline_parser/
-  baseline_path: /opt/ipeng/mops/
-
-# Test files to be run for each vendor:
 JUNOS:
   - test_isis_adjacency.yml
   - test_ldp_interface.yml
