@@ -22,7 +22,7 @@ def arguments():
     p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)')
     p.add_argument('-b', '--before',
                    help='Keyword to identify "Before" files (default=before)')
-    p.add_argument('-c', '--config',  action='count', default=0, 
+    p.add_argument('-c', '--config',  action='count', default=0,
                    help='Display configuration diff only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
@@ -104,7 +104,7 @@ class Config(object):
         """ Set logging format, level, and handlers """
         msg_only_formatter = logging.Formatter('%(message)s')
         detail_formatter = logging.Formatter('%(asctime)s - %(message)s')
-  
+
         self.logger = logging.getLogger("BaselineParser")
         self.logger.setLevel(logging.DEBUG)
         # File Handler:
