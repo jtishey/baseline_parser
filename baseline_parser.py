@@ -111,13 +111,15 @@ class Config(object):
 
     def setup_logging(self):
         """ Set logging format, level, and handlers """
+        log_file = self.mop_path + '/' + "BaselineParser.log"
+        if os.path.exists(log_file):
+            os.remove(log_file)
         msg_only_formatter = logging.Formatter('%(message)s')
         detail_formatter = logging.Formatter('%(asctime)s - %(message)s')
-
         self.logger = logging.getLogger("BaselineParser")
         self.logger.setLevel(logging.DEBUG)
         # File Handler:
-        fh = logging.FileHandler(self.mop_path + '/' + "BaselineParser.log")
+        fh = logging.FileHandler(log_file)
         fh.setFormatter(msg_only_formatter)
         fh.setLevel(logging.DEBUG)
         # Stream Handler:
