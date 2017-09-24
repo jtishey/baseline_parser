@@ -7,5 +7,5 @@
   tests:
     - no-diff: [1, 0]
       info: "PASSED! PIM interface {{ pre[1] }} still has neighbor {{ pre[0] }}"
-      err: "FAILED! PIM interface {{ pre[1] }} had neighbor {{ pre[0] }} and is has {{ post[0] }}"
+      err: "FAILED! PIM interface {{ pre[1] }} had neighbor {{ pre[0] }} and is now {{ post[0] }}"
 
