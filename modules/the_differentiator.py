@@ -80,6 +80,7 @@ class Run(object):
             if self.pass_status == 'UNSET':
                 self.pass_status = 'FAIL'
                 self.post = ''
+            #if self.
             self.print_result()
         self.after_only_lines()
         self.print_totals()
@@ -153,7 +154,15 @@ class Run(object):
         """ Print command test results for all lines of that command output """
         logger = logging.getLogger("BaselineParser")
         if self.summary[(self.test_values[0]['command'])]['FAIL'] == 0:
-            logger.info("PASS! All " + str(self.summary[(self.test_values[0]['command'])]['PASS']) + " tests passed!\n")
+            if self.summary[(self.test_values[0]['command'])]['PASS'] == 0:
+                if self.test_values[0]['ignore-null']:
+                    logger.info("PASS! No output matched\n")
+                    self.summary[(self.test_values[0]['command'])]['PASS'] += 1
+                else:
+                    logger.info("FAIL! No output matched\n")
+                    self.summary[(self.test_values[0]['command'])]['FAIL'] += 1
+            else:
+                logger.info("PASS! All " + str(self.summary[(self.test_values[0]['command'])]['PASS']) + " tests passed!\n")
         else:
             logger.info("FAIL! " + str(self.summary[(self.test_values[0]['command'])]['PASS']) + " tests passed, " + \
                   str(self.summary[(self.test_values[0]['command'])]['FAIL']) + " tests failed!\n")

@@ -36,7 +36,9 @@ XR:
   - test_isis_neighbor.yml
   - test_ldp_neighbor.yml
   - test_mpls_interface.yml
+  #- test_pim_neighbor.yml
   - test_platform.yml
+  #- test_rsvp_interface.yml
   - test_redundancy.yml
 
 TiMOS:
