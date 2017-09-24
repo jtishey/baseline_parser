@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-This is a script to try any parse and compare info from
+This is a script to parse and compare info from
 a baseliner script in a managable fashon.
 John.Tishey@windstream.com 2017
 """
@@ -24,9 +24,10 @@ def arguments():
     p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only')
     p.add_argument('-c', '--conf', action='count', default=0, help='Display configuration diff only')
     p.add_argument('-s', '--summ', action='count', default=0, help='Display summary output only')
+    p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log file')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    verbose, tag1, tag2, stest = 0, 'before', 'after', ''
+    verbose, tag1, tag2, stest, log_only = 0, 'before', 'after', '', ''
     mop = args['mop']
     if args['verbose']:
         verbose = args['verbose']
@@ -40,6 +41,8 @@ def arguments():
         verbose = 40
     if args['dev']:
         stest = args['dev']
+    if args['log']:
+        verbose = 60
     return mop, tag1, tag2, stest, verbose
 
 
@@ -96,7 +99,6 @@ class Config(object):
                     self.after_files.append(_file)
             except:
                 continue
-
         if len(self.before_files) == 0 or \
            len(self.after_files) == 0:
             print("\nBefore/After files not found\n")
@@ -127,7 +129,8 @@ class Config(object):
             sh.setLevel(logging.INFO)
 
         self.logger.addHandler(fh)
-        self.logger.addHandler(sh)
+        if self.verbose != 60:
+            self.logger.addHandler(sh)
 
 
 class Device(object):
