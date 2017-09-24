@@ -116,7 +116,7 @@ class Config(object):
         self.logger.setLevel(logging.DEBUG)
         # File Handler:
         fh = logging.FileHandler(self.mop_path + '/' + "BaselineParser.log")
-        fh.setFormatter(detail_formatter)
+        fh.setFormatter(msg_only_formatter)
         fh.setLevel(logging.DEBUG)
         # Stream Handler:
         sh = logging.StreamHandler(sys.stdout)
