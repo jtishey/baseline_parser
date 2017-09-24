@@ -34,12 +34,12 @@ def arguments():
         tag1 = args['before']
     if args['after']:
         tag2 = args['after']
-    if  args['config']:
+    if  args['conf']:
         verbose = 20
-    if args['summary']:
+    if args['summ']:
         verbose = 40
-    if args['device']:
-        stest = args['device']
+    if args['dev']:
+        stest = args['dev']
     return mop, tag1, tag2, stest, verbose
 
 

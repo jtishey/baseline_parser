@@ -5,6 +5,7 @@ JUNOS:
   - test_bgp_summary.yml
   - test_chassis_fpc.yml
   - test_interfaces_terse.yml
+  - test_isis_interface.yml
   - test_isis_adjacency.yml
   - test_ldp_interface.yml
   - test_ldp_neighbor.yml
