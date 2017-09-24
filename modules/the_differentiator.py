@@ -71,7 +71,7 @@ class Run(object):
                         iter_match = True
                 if iter_match is False:
                     skip_line = True
-            if skip_line is True:
+            if skip_line:
                 continue
             # NO-DIFF =  All indexes must match before/after
             if 'no-diff' in self.test_values[0]['tests'][0]:
@@ -124,7 +124,7 @@ class Run(object):
         else:
             self.summary[(self.test_values[0]['command'])]['PASS'] += 1
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['info']))
-            if self.post == '':
+            if not self.post:
                 self.post = ['null'] * 12
             logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post))
 
@@ -142,7 +142,7 @@ class Run(object):
                     for word in self.test_values[0]['iterate']:
                         if word not in after_line:
                             skip_line = True
-                if skip_line is False:
+                if not skip_line:
                     self.summary[(self.test_values[0]['command'])]['FAIL'] += 1
                     self.pre = after_line.split()
                     self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
@@ -175,7 +175,7 @@ class Run(object):
 
         diff = difflib.unified_diff(before_cfg, after_cfg)
         cfg_diff = '\n'.join(diff)
-        if cfg_diff != '':
+        if cfg_diff:
             if self.device.config.verbose > 0:
                 logger.info("FAILED! " + self.device.hostname + " configuation changed")
                 for line in cfg_diff.splitlines():
@@ -228,7 +228,7 @@ class Run(object):
                 line = line.split()
                 found_match = True
                 break
-        if found_match is False:
+        if not found_match:
             self.ping_totals['SKIP'] += 1
             return
         # Look for the results line in the AFTER
@@ -238,7 +238,7 @@ class Run(object):
                 after_line = after_line.split()
                 found_match = True
                 break
-        if found_match is False:
+        if not found_match:
             logger.info("FAILED! " + self.ping_test + " not found in the after baseline")
             self.ping_totals['FAIL'] += 1
             return

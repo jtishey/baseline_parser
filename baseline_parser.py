@@ -174,7 +174,7 @@ if __name__ == '__main__':
     
     for i, item in enumerate(CONFIG.before_files):
         hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
-        if CONFIG.stest != [] and hostname not in CONFIG.stest:
+        if CONFIG.stest and hostname not in CONFIG.stest:
             continue
         device = Device()
         device.config = CONFIG
@@ -186,6 +186,6 @@ if __name__ == '__main__':
         device.output = the_extractorator.run(device)
 
         # Execute the diff on the command output
-        if device.output != '':
+        if device.output:
             the_differentiator.Run(device)
     os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
