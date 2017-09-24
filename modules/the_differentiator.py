@@ -176,7 +176,6 @@ class Run(object):
         diff = difflib.unified_diff(before_cfg, after_cfg)
         cfg_diff = '\n'.join(diff)
         if cfg_diff:
-            if self.device.config.verbose > 0:
                 logger.info("FAILED! " + self.device.hostname + " configuation changed")
                 for line in cfg_diff.splitlines():
                     if '@@' in line:
@@ -184,8 +183,6 @@ class Run(object):
                     if '+++' not in line and '---' not in line and line != '':
                         logger.debug(line)
                 logger.info('\n')
-            else:
-                logger.info("FAILED! " + self.device.hostname + " configuation changed ('-v' to view)\n")
         else:
             logger.info("PASS! No changes in " + self.device.hostname + " configuration\n")
 
