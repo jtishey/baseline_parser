@@ -2,6 +2,7 @@ project_path: /opt/ipeng/scripts/baseline_parser/
 mop_path: /opt/ipeng/mops/
 
 JUNOS:
+  - test_bfd_session.yml
   - test_bgp_summary.yml
   - test_chassis_fpc.yml
   - test_interfaces_terse.yml
@@ -12,6 +13,7 @@ JUNOS:
   - test_ldp_session.yml
   - test_pim_interfaces.yml
   - test_pim_neighbors.yml
+  - test_rsvp_session.yml
   - test_rsvp_interface.yml
   - test_task_replication.yml
 
