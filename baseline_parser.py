@@ -27,7 +27,7 @@ def arguments():
     p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log file')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    verbose, tag1, tag2, stest, log_only = 0, 'before', 'after', '', ''
+    verbose, tag1, tag2, stest, log_only = 0, 'before', 'after', [], ''
     mop = args['mop']
     if args['verbose']:
         verbose = args['verbose']
@@ -40,7 +40,8 @@ def arguments():
     if args['summ']:
         verbose = 40
     if args['dev']:
-        stest = args['dev']
+        for device in  args['dev'].split(','):
+            stest.append(device)
     if args['log']:
         verbose = 60
     return mop, tag1, tag2, stest, verbose
@@ -51,7 +52,8 @@ class Config(object):
     def __init__(self):
         """ Init variables """
         self.mop_number, self.before_kw, self.after_kw, self.stest, self.verbose = arguments()
-        proj_path = os.path.dirname(os.path.abspath(__file__))
+        #proj_path = os.path.dirname(os.path.abspath(__file__))
+        proj_path = '/opt/ipeng/scripts/baseline_parser'
         with open(proj_path + '/config.yml') as _f:
             self.cfg = yaml.load(_f)
         self.mop_path = ''
@@ -171,7 +173,7 @@ logger = CONFIG.logger
 
 for i, item in enumerate(CONFIG.before_files):
     hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
-    if CONFIG.stest != '' and hostname!= CONFIG.stest:
+    if CONFIG.stest != [] and hostname not in CONFIG.stest:
         continue
     device = Device()
     device.config = CONFIG
@@ -184,4 +186,4 @@ for i, item in enumerate(CONFIG.before_files):
 
     # Execute the diff on the command output
     if device.output != '':
-        device.results = the_differentiator.Run(device)
+        the_differentiator.Run(device)

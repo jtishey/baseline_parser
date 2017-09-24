@@ -8,4 +8,3 @@
     - no-diff: [0]
       info: "PASSED! PIM nieghbor still on interface {{ pre[0] }}"
       err: "FAILED! PIM neighbor on interface {{ pre[0] }} failed check"
-

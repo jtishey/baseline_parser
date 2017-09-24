@@ -12,7 +12,7 @@ Required arguments:
 Optional arguments:
  -b / --before  -  Specify a keyword to identify "BEFORE" baseline files (default = before)
  -a / --after   -  Specify a keyword to identify "AFTER" baseline files (default = after)
- -d / --dev     -  Display output for a single device from the baselines (default = all)
+ -d / --dev     -  Run checks for a single device from the baselines (default = all)
  -c / --conf    -  Display configuration diffs only (no other tests)
  -s / --summ    -  Display summary results only (Total number of passed/failed tests)
  -v / --verbose -  Display output of PASSED checks as well as FAILED checks (off by default)
@@ -33,11 +33,15 @@ An alias link has been created in server's PATH, named 'baseline_check'
 By default, only Failed tests are displayed, and only a MOP number is required.
 $ baseline_check -m 123456
 
-If boefore/after keywords other than 'before' & 'after' have been specified when running Pinky_Baseliner, those must also be specified>
+If boefore/after keywords other than 'before' & 'after' have been specified when running Pinky_Baseliner, those must also be specified:
 $ baseline_check -m 123455 -b PRE -a POST
 
-Bt default, only Failed test details are displayed, to display details for all tests, use verbose flags.
+By default, only Failed test details are displayed, to display details for all tests, use verbose flags:
 $ baseline_check -m 123456 -v
+
+For large MOPs, you may want to run tests on a specific device(s), to do this use the -d option:
+$ baseline_check -m 123456 -d pe01.anyw01-us
+$ baseline_check -m 123456 -d pe01.anyw01-us,pe02.anyw01-us
 
 -s can be used to display only the device summary
 -c can be used to display only the configuration diffs
