@@ -27,7 +27,7 @@ def arguments():
     p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log file')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    verbose, tag1, tag2, stest, log_only = 0, 'before', 'after', [], ''
+    verbose, tag1, tag2, stest = 0, 'before', 'after', []
     mop = args['mop']
     if args['verbose']:
         verbose = args['verbose']
@@ -140,10 +140,10 @@ class Device(object):
     def __init__(self):
         """ Init device variables and inherit from Config """
         self.hostname = ''
-        self.files = []
         self.os_type = ''
-        self.output = []
         self.results = ''
+        self.files = []
+        self.output = []
 
     def assign_values(self, host, i):
         """ Assign device-specific values """
@@ -165,25 +165,27 @@ class Device(object):
         self.os_type = os_type[0].rstrip()
 
 
-CONFIG = Config()
-CONFIG.folder_search()
-CONFIG.file_search()
-CONFIG.setup_logging()
-logger = CONFIG.logger
+if __name__ == '__main__':
+    CONFIG = Config()
+    CONFIG.folder_search()
+    CONFIG.file_search()
+    CONFIG.setup_logging()
+    logger = CONFIG.logger
+    
+    for i, item in enumerate(CONFIG.before_files):
+        hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
+        if CONFIG.stest != [] and hostname not in CONFIG.stest:
+            continue
+        device = Device()
+        device.config = CONFIG
+        device.assign_values(hostname, i)
 
-for i, item in enumerate(CONFIG.before_files):
-    hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
-    if CONFIG.stest != [] and hostname not in CONFIG.stest:
-        continue
-    device = Device()
-    device.config = CONFIG
-    device.assign_values(hostname, i)
+        # Get commands and output from baseline files
+        logger.info("\n\nRunning " + device.hostname)
+        logger.info("-" * 24)
+        device.output = the_extractorator.run(device)
 
-    # Get commands and output from baseline files
-    logger.info("\n\nRunning " + device.hostname)
-    logger.info("-" * 24)
-    device.output = the_extractorator.run(device)
-
-    # Execute the diff on the command output
-    if device.output != '':
-        the_differentiator.Run(device)
+        # Execute the diff on the command output
+        if device.output != '':
+            the_differentiator.Run(device)
+    os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
