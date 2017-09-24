@@ -1,19 +1,20 @@
 
-!!! STILL EARLY DEVELOPMENT !!!
-
  baseline_parser.py
 ###################
 
- Example usage: baseline_check -m 233806
+ Example usage: python baseline_parser.py -m 233806
+ Alias Example: baseline_check -m 233806
 
 USAGE:
 Required arguments:
- -m / --mop     -  Specify a MOP number to locate the baseline files for and run checks against
+ -m / --mop     -  Specify a MOP number or tag to locate the baseline files for and run checks against
 
 Optional arguments:
-
  -b / --before  -  Specify a keyword to identify "BEFORE" baseline files (default = before)
  -a / --after   -  Specify a keyword to identify "AFTER" baseline files (default = after)
+ -d / --dev     -  Display output for a single device from the baselines (default = all)
+ -c / --conf    -  Display configuration diffs only (no other tests)
+ -s / --summ    -  Display summary results only (Total number of passed/failed tests)
  -v / --verbose -  Display output of PASSED checks as well as FAILED checks (off by default)
  -h / --help    -  Display CLI syntax help
 
@@ -24,20 +25,40 @@ Script looks for baseline files based on the MOP number (and optionally before/a
 It then seperates the commands executed during the baselines to be tested individually and displays
 output based on the results of those tests. 
 
-Currently only JUNOS really has testfiles created, and only no-diff tests are implemented (rough-draft)
+
+Running the script:
+-------------------------------
+An alias link has been created in server's PATH, named 'baseline_check'
+
+By default, only Failed tests are displayed, and only a MOP number is required.
+$ baseline_check -m 123456
+
+If boefore/after keywords other than 'before' & 'after' have been specified when running Pinky_Baseliner, those must also be specified>
+$ baseline_check -m 123455 -b PRE -a POST
+
+Bt default, only Failed test details are displayed, to display details for all tests, use verbose flags.
+$ baseline_check -m 123456 -v
+
+-s can be used to display only the device summary
+-c can be used to display only the configuration diffs
+
+Lastly, a log file is created in the MOP baseline folder containing the verbose output on each run.
+Ex. /opt/ipeng/mops/Year_2017/Sep_01/123456/BaselineParser.log
+
 
 
 Creating and Editing Testfiles:
 -------------------------------
 
-testfiles are located in /opt/ipeng/scripts/baseline_parser/testfiles/  in a seperate folder for each OS Type
+testfiles are located in '/opt/ipeng/scripts/baseline_parser/testfiles/' in a seperate folder for each OS Type
 (JUNOS / IOS / XR / TiMOS)
 
 They are YAML files and are currently setup as follows:
 
+JUNOS/test_isis_adjacency.yml:
 ---
 - show_isis_adjacency:              < Arbitrary test case name
-  command:  show isis adjacency     < Command to match in the baseline file
+  command:  show isis adjacency     < Command to match in the baseline files
   ignore-null: False                < Make test not fail if there is nothing to match (future)
   iterate: [all]                    < Lines of command output to iterate on, either [all] or a list of keywords to match in a line
   blacklist: [Interface, Metric]    < Ignore lines containing these words (comma seperated inside brackets: [ ]
