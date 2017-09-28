@@ -2,7 +2,7 @@
 - show_ipv6_neighbors:
   command: show ipv6 neighbors
   ignore-null: True
-  iterate: [']
+  iterate: [all]
   blacklist: [Address]
   tests:
     - no-diff: [-1, 0]
