@@ -170,6 +170,7 @@ class Run(object):
     def config_diff(self):
         """ Run diff on before and after config """
         logger = logging.getLogger("BaselineParser")
+        self.summary['show configuration'] = {'PASS': 0, 'FAIL': 0}
         cmds = {'JUNOS': 'show configuration',
                 'IOS': 'show run',
                 'XR': 'show configuration running-config',
@@ -191,15 +192,19 @@ class Run(object):
                         line = '=' * 36
                     if '+++' not in line and '---' not in line and line != '':
                         logger.debug(line)
+                        if line[0] == '-' or line[0] == '+':
+                            self.summary['show configuration']['FAIL'] += 1
                 logger.info('\n')
         else:
             logger.info("PASS! No changes in " + self.device.hostname + " configuration\n")
+            self.summary['show configuration']['PASS'] += 1
 
     def test_ping_output(self):
         """ Run ping tests """
         logger = logging.getLogger("BaselineParser")
         logger.info("******** Testing ping commands ********")
         self.ping_totals = {"PASS": 0, "FAIL": 0, "SKIP": 0}
+        self.summary['ping checks'] = {'PASS': 0, 'FAIL': 0}
         for self.ping_test in self.device.output['before'].keys():
             if self.ping_test[:4] == 'ping':
                 try:
@@ -213,9 +218,11 @@ class Run(object):
         if self.ping_totals['FAIL'] == 0:
             logger.info("PASS! " + str(self.ping_totals["PASS"]) + " ping checks passed! (" + \
                   str(self.ping_totals["SKIP"]) + " skipped) \n")
+            self.summary['ping checks']['PASS'] = self.ping_totals['PASS']
         else:
             logger.info("FAIL! " + str(self.ping_totals['PASS']) + " tests passed, " + \
                    str(self.ping_totals['FAIL']) + " tests failed!\n")
+            self.summary['ping checks']['FAIL'] = self.ping_totals['FAIL']
 
     def execute_ping_check(self):
         """ Test ping commands - no testfile needed """
