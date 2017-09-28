@@ -16,8 +16,7 @@ def run(device):
     elif device.os_type == 'TiMOS':
         prompt = ':' + device.hostname + '#'
     else:
-        print("ERROR: Device OS not found or not yet supported")
-        return ""
+        return "ERROR: " + device.hostname + " OS not found or not yet supported"
     output = extract(device, prompt)
     return output
 

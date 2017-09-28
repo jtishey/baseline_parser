@@ -188,6 +188,8 @@ if __name__ == '__main__':
         device.output = the_extractorator.run(device)
 
         # Execute the diff on the command output
-        if device.output:
+        if type(device.output) is dict:
             the_differentiator.Run(device)
+        elif device.output.startswith('ERROR'):
+            logger.info(device.output)
     os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
