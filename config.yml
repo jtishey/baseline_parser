@@ -43,6 +43,15 @@ XR:
 
 TiMOS:
   - test_active_subscribers.yml
-  - test_port.yml
-  - test_router_isis_adjacency.yml
+  - test_dhcp_summary.yml
   - test_mpls_interface.yml
+  - test_ldp_interface.yml
+  - test_ldp_session.yml
+  - test_pim_neighbor.yml
+  - test_port.yml
+  - test_isis_adjacency.yml
+  - test_isis_interface.yml
+  - test_rsvp_interface.yml
+  - test_router_status.yml
+ #- test_service_21_sap.yml
+

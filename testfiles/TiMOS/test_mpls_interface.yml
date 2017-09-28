@@ -3,7 +3,7 @@
   command: show router mpls interface
   ignore-null: False
   iterate: [Up, Down]
-  blacklist: []
+  blacklist: [system]
   tests:
     - no-diff: [0, 2, 3]
       info: "PASSED! MPLS interface {{ pre[0] }} is still {{ pre[2] }}/{{ pre[3] }}"
