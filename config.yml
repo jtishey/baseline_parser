@@ -8,6 +8,7 @@ JUNOS:
   - test_interfaces_terse.yml
   - test_isis_interface.yml
   - test_isis_adjacency.yml
+  - test_ipv6_neighbors.yml
   - test_ldp_interface.yml
   - test_ldp_neighbor.yml
   - test_ldp_session.yml
@@ -15,6 +16,7 @@ JUNOS:
   - test_pim_neighbors.yml
   - test_rsvp_session.yml
   - test_rsvp_interface.yml
+  - test_route_summary.yml
   - test_task_replication.yml
 
 IOS:

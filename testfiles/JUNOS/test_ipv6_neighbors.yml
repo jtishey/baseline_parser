@@ -1,0 +1,10 @@
+---
+- show_ipv6_neighbors:
+  command: show ipv6 neighbors
+  ignore-null: True
+  iterate: [']
+  blacklist: [Address]
+  tests:
+    - no-diff: [-1, 0]
+      info: "PASSED! IPV6 Neighbor {{ pre[0] }} still on {{ pre[-1] }}"
+      err: "FAILED! IPV6 Neighbor {{ pre[0] }} interface {{ pre[-1] }} changed to {{ post[-1] }}"
