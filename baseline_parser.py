@@ -18,13 +18,13 @@ from modules import the_differentiator
 def arguments():
     """ Parse entered CLI arguments with argparse """
     p = argparse.ArgumentParser(description='Parse and compare before/after baseline files.')
-    p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
-    p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)')
-    p.add_argument('-b', '--before', help='Keyword to identify "Before" files (default=before)')
-    p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only')
+    p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True, metavar='###')
+    p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)', metavar='PRE')
+    p.add_argument('-b', '--before', help='Keyword to identify "Before" files (default=before)', metavar='PST')
+    p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only', metavar='DEV')
     p.add_argument('-c', '--conf', action='count', default=0, help='Display configuration diff only')
     p.add_argument('-s', '--summ', action='count', default=0, help='Display summary output only')
-    p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log file')
+    p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log to file')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
     verbose, tag1, tag2, stest = 0, 'before', 'after', []
