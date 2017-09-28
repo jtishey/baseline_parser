@@ -55,5 +55,4 @@ TiMOS:
   - test_port.yml
   - test_router_status.yml
   - test_rsvp_interface.yml
-  - test_service_21_sap.yml
-
+ #- test_service_21_sap.yml

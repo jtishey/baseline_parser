@@ -1,9 +1,9 @@
 ---
 - show_module:
   command: show mod
-  ignore-null: False
+  ignore-null: True
   iterate: [all]
-  blacklist: ['Mod', '----', 'OK', 'Ok', '.', 'Pass', 'Fail']
+  blacklist: ['Mod', '----', 'OK', 'Ok', '.', 'Pass', 'Fail', '^']
   tests:
     - no-diff: [0, -2]
       info: "PASSED! Slot {{ pre[0] }} still has a {{ pre[-2] }}"

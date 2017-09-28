@@ -1,8 +1,8 @@
 ---
 - show_redundancy:
   command: show redundancy
-  ignore-null: False
-  iterate: [Redundancy, Active]
+  ignore-null: True
+  iterate: ['Redundancy', 'Active', '^']
   blacklist: []
   tests:
     - no-diff: [0, -1]

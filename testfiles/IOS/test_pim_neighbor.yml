@@ -3,7 +3,7 @@
   command:  show ip pim neighbor
   ignore-null: True
   iterate: [all]
-  blacklist: [PIM, Capable, Neighbor, Address]
+  blacklist: ['PIM', 'Capable', 'Neighbor', 'Address', '^']
   tests:
     - no-diff: [1, 0]
       info: "PASSED! PIM interface {{ pre[1] }} still has neighbor {{ pre[0] }}"

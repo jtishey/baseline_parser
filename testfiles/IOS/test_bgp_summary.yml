@@ -3,7 +3,7 @@
   command:  show ip bgp all summary
   ignore-null: True
   iterate: [all]
-  blacklist: [BGP, address, memory, Neighbor, configuration]
+  blacklist: ['BGP', 'address', 'memory', 'Neighbor', 'configuration', '^']
   tests:
     - no-diff: [0, -1]
       info: "PASSED! BGP neighbor {{ pre[0] }} routes/status is still {{ pre[-1] }}"
