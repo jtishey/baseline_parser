@@ -77,19 +77,29 @@ class Config(object):
             self.mop_path = found_list[0]
             print("\nFound " + self.mop_path)
         elif len(found_list) > 1:
-            print("\nFound " + str(len(found_list)) + " baselines for MOP " +
-                  self.mop_number + ":")
-            print("-" * 36)
-            for i, mop_folder in enumerate(found_list):
-                print(str(i + 1) + ': ' + mop_folder)
-            selection = raw_input("\nSelect a folder to test: ")
-            print("\n")
-            try:
-                selection = int(selection)
-                self.mop_path = found_list[selection - 1]
-            except:
-                print("ERROR: Please enter the number of the selection only\n")
-                exit(1)
+            # if log file only, just use the newest folder
+            if self.verbose == 60:
+                best_fldr = found_list[0]
+                newest = os.path.getctime(best_fldr)
+                for fldr in found_list:
+                    if os.path.getctime(fldr) > newest:
+                        newest = os.path.getctime(fldr)
+                        best_fldr = fldr
+                self.mop_path = best_fldr
+            else:
+                print("\nFound " + str(len(found_list)) + " baselines for MOP " +
+                      self.mop_number + ":")
+                print("-" * 36)
+                for i, mop_folder in enumerate(found_list):
+                    print(str(i + 1) + ': ' + mop_folder)
+                selection = raw_input("\nSelect a folder to test: ")
+                print("\n")
+                try:
+                    selection = int(selection)
+                    self.mop_path = found_list[selection - 1]
+                except:
+                    print("ERROR: Please enter the number of the selection only\n")
+                    exit(1)
         else:
             print("ERROR: MOP number not found!")
             exit(1)
