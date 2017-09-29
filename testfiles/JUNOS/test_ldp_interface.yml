@@ -3,7 +3,7 @@
   command: show ldp interface 
   ignore-null: False
   iterate: [all]
-  blacklist: [Interface, '^', error]
+  blacklist: [Interface, '^', error, count]
   tests:
     - no-diff: [0, 2]
       info: "PASSED! LDP interface {{ pre[0] }} still has {{ pre[2] }} neighbors"
