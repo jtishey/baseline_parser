@@ -4,7 +4,6 @@ baseline_compare module to reuse existing log files to save resources
 john.tishey@windstream.com 2017
 """
 
-import logging
 
 class Run(object):
     """ Method is called when an existing log file is found and override is false """
@@ -16,11 +15,11 @@ class Run(object):
                 prev_run = _f.readlines()
         except:
             print("ERROR: Could not open log file")
-        
-        sum_flag = False
-        cfg_flag = False
-        dev_flag = False
-            
+            exit(1)
+
+        print("Using log file from previous check, use -o to override and run new checks\n")
+
+        sum_flag, cfg_flag, dev_flag = False, False, False
         for line in prev_run:
             line = line.rstrip()
             if line.startswith('Running'):
@@ -39,7 +38,7 @@ class Run(object):
             # set dev_flag to true if not set so it outputs all devs
             if len(CONFIG.stest) == 0:
                 dev_flag = True
-            
+
             if dev_flag is True:
                 #VERBOSE = 1
                 if CONFIG.verbose == 1:

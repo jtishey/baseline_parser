@@ -19,14 +19,14 @@ from modules import the_recyclanator
 def arguments():
     """ Parse entered CLI arguments with argparse """
     p = argparse.ArgumentParser(description='Parse and compare before/after baseline files.')
-    p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True, metavar='###')
+    p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True)
     p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)', metavar='PRE')
     p.add_argument('-b', '--before', help='Keyword to identify "Before" files (default=before)', metavar='PST')
-    p.add_argument('-c', '--conf', action='count', default=0, help='Display configuration diff only')
+    p.add_argument('-c', '--config', action='count', default=0, help='Display configuration diff only')
     p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only', metavar='DEV')
     p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log to file')
-    p.add_argument('-o', '--over', action='count', default=0, help='Ignore previous log files and force new check')
-    p.add_argument('-s', '--summ', action='count', default=0, help='Display summary output only')
+    p.add_argument('-o', '--override', action='count', default=0, help='Ignore previous log files and force new check')
+    p.add_argument('-s', '--summary', action='count', default=0, help='Display summary output only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
     verbose, tag1, tag2, stest = 0, 'before', 'after', []
@@ -38,16 +38,16 @@ def arguments():
         tag1 = args['before']
     if args['after']:
         tag2 = args['after']
-    if  args['conf']:
+    if  args['config']:
         verbose = 20
-    if args['summ']:
+    if args['summary']:
         verbose = 40
     if args['dev']:
         for device in  args['dev'].split(','):
             stest.append(device)
     if args['log']:
         verbose = 60
-    if args['over']:
+    if args['override']:
         override = True
     return mop, tag1, tag2, stest, override, verbose
 
@@ -77,7 +77,7 @@ class Config(object):
             self.mop_path = found_list[0]
             print("\nFound " + self.mop_path)
         elif len(found_list) > 1:
-            print("\nFound " + str(len(found_list)) + " baselines for MOP " + \
+            print("\nFound " + str(len(found_list)) + " baselines for MOP " +
                   self.mop_number + ":")
             print("-" * 36)
             for i, mop_folder in enumerate(found_list):
@@ -123,7 +123,6 @@ class Config(object):
         if os.path.exists(log_file):
             os.remove(log_file)
         msg_only_formatter = logging.Formatter('%(message)s')
-        detail_formatter = logging.Formatter('%(asctime)s - %(message)s')
         self.logger = logging.getLogger("BaselineParser")
         self.logger.setLevel(logging.DEBUG)
         # File Handler:
@@ -159,13 +158,13 @@ class Device(object):
         """ Assign device-specific values """
         self.hostname = host
         try:
-            self.files.append(os.path.abspath(self.config.mop_path + '/' + \
+            self.files.append(os.path.abspath(self.config.mop_path + '/' +
                               self.config.before_files[i]))
         except IndexError:
             logger.info("ERROR: No before baseline found for " + host)
             exit(1)
         try:
-            self.files.append(os.path.abspath(self.config.mop_path + "/" + \
+            self.files.append(os.path.abspath(self.config.mop_path + "/" +
                               self.config.after_files[i]))
         except IndexError:
             logger.info("ERROR: No after baseline found for " + host)
@@ -182,7 +181,7 @@ if __name__ == '__main__':
     CONFIG.file_search()
     CONFIG.setup_logging()
     logger = CONFIG.logger
-    
+
     # One device at a time copy the config, parse, and compare
     for i, item in enumerate(CONFIG.before_files):
         hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
@@ -200,8 +199,8 @@ if __name__ == '__main__':
         # Execute the diff on the command output
         if type(device.output) is dict:
             the_differentiator.Run(device)
-        elif device.output.startswith('ERROR'):
+        else:
             logger.info(device.output)
-    
-    #Update log file permissions
+
+    # Update log file permissions
     os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)

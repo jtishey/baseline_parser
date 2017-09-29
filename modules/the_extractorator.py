@@ -12,7 +12,7 @@ def run(device):
     elif device.os_type == 'IOS':
         prompt = device.hostname + '#'
     elif device.os_type == 'XR':
-        prompt = 'RP/0/RSP0/CPU0:' + device.hostname + '#'    
+        prompt = 'RP/0/RSP0/CPU0:' + device.hostname + '#'
     elif device.os_type == 'TiMOS':
         prompt = ':' + device.hostname + '#'
     else:
@@ -50,6 +50,5 @@ def extract(device, prompt):
         if device.config.before_kw in each_file:
             output['before'] = commands
         else:
-            output['after'] =  commands
+            output['after'] = commands
     return output
-
