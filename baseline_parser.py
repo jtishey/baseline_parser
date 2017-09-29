@@ -29,8 +29,7 @@ def arguments():
     p.add_argument('-s', '--summary', action='count', default=0, help='Display summary output only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    verbose, tag1, tag2, stest = 0, 'before', 'after', []
-    override = False
+    tag1, tag2, stest, override, verbose = 'before', 'after', [], False, 0
     mop = args['mop']
     if args['verbose']:
         verbose = args['verbose']
