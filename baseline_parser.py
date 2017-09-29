@@ -13,6 +13,7 @@ import subprocess
 from modules import yaml
 from modules import the_extractorator
 from modules import the_differentiator
+from modules import the_recyclanator
 
 
 def arguments():
@@ -21,13 +22,15 @@ def arguments():
     p.add_argument('-m', '--mop', help='Specify a MOP number to parse', required=True, metavar='###')
     p.add_argument('-a', '--after', help='Keyword to identify "After" files (default=after)', metavar='PRE')
     p.add_argument('-b', '--before', help='Keyword to identify "Before" files (default=before)', metavar='PST')
-    p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only', metavar='DEV')
     p.add_argument('-c', '--conf', action='count', default=0, help='Display configuration diff only')
-    p.add_argument('-s', '--summ', action='count', default=0, help='Display summary output only')
+    p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only', metavar='DEV')
     p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log to file')
+    p.add_argument('-o', '--over', action='count', default=0, help='Ignore previous log files and force new check')
+    p.add_argument('-s', '--summ', action='count', default=0, help='Display summary output only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
     verbose, tag1, tag2, stest = 0, 'before', 'after', []
+    override = False
     mop = args['mop']
     if args['verbose']:
         verbose = args['verbose']
@@ -44,14 +47,16 @@ def arguments():
             stest.append(device)
     if args['log']:
         verbose = 60
-    return mop, tag1, tag2, stest, verbose
+    if args['over']:
+        override = True
+    return mop, tag1, tag2, stest, override, verbose
 
 
 class Config(object):
     """ Variables used by all devices """
     def __init__(self):
         """ Init variables """
-        self.mop_number, self.before_kw, self.after_kw, self.stest, self.verbose = arguments()
+        self.mop_number, self.before_kw, self.after_kw, self.stest, self.override, self.verbose = arguments()
         #proj_path = os.path.dirname(os.path.abspath(__file__))
         proj_path = '/opt/ipeng/scripts/baseline_parser'
         with open(proj_path + '/config.yml') as _f:
@@ -88,6 +93,9 @@ class Config(object):
         else:
             print("ERROR: MOP number not found!")
             exit(1)
+        if os.path.exists(self.mop_path + '/BaselineParser.log'):
+            if self.override is False:
+                the_recyclanator.Run(self)
 
     def file_search(self):
         """ Creates 2 sorted lists - before & after filenames """
