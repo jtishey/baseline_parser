@@ -1,6 +1,6 @@
 ---
 - show_mpls_interface:
-  command:  show mpls interface
+  command: show mpls interface
   ignore-null: False
   iterate: ['Yes', 'No']
   blacklist: []

@@ -1,9 +1,9 @@
 ---
 - show_isis_adjacency:
-  command:  show isis adjacency
+  command: show isis adjacency
   ignore-null: False
   iterate: [all]
-  blacklist: [Interface]
+  blacklist: [Interface, '^', error]
   tests:
     - no-diff: [0,1,3]
       info: "PASSED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} is still {{ pre[3] }}"

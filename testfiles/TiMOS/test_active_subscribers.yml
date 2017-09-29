@@ -1,9 +1,9 @@
 ---
 - show_active_subscribers:
-  command:  show service active-subscribers summary
+  command: show service active-subscribers summary
   ignore-null: False
   iterate: [Total]
-  blacklist: []
+  blacklist: ['^', 'MINOR']
   tests:
     - no-diff: [0, -1]
       info: "PASSED! Active subscribers is still {{ pre[-1] }}"

@@ -1,6 +1,6 @@
 ---
 - show_bfd_neighbor:
-  command:  show bfd neighbor
+  command: show bfd neighbor
   ignore-null: True
   iterate: [all]
   blacklist: ['Addr', '^']

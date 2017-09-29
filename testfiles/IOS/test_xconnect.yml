@@ -1,6 +1,6 @@
 ---
 - show_xconnect:
-  command:  show xconnect all
+  command: show xconnect all
   ignore-null: True
   iterate: [all]
   blacklist: [nterface, '----', '=', '^', Segment]
@@ -8,4 +8,3 @@
     - no-diff: [2, 0, -2]
       info: "PASSED! XCONNECT on {{ pre[2] }} to {{ pre[-2] }} is still {{ pre[0] }}"
       err: "FAILED! XCONNECT on {{ pre[2] }} to {{ pre[-2] }} was {{ pre[0] }}, and is now {{ post[0] }}"
-

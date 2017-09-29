@@ -1,6 +1,6 @@
 ---
 - show_port:
-  command:  show port
+  command: show port
   ignore-null: False
   iterate: [Up, Down]
   blacklist: []

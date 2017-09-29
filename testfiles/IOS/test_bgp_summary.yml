@@ -1,6 +1,6 @@
 ---
 - show_bgp_summary:
-  command:  show ip bgp all summary
+  command: show ip bgp all summary
   ignore-null: True
   iterate: [all]
   blacklist: ['BGP', 'address', 'memory', 'Neighbor', 'configuration', '^']

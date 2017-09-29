@@ -3,7 +3,7 @@
   command: show router ldp interface  
   ignore-null: False
   iterate: [all]
-  blacklist: ['===', 'Interface', '---', 'ipv', 'Time']
+  blacklist: ['===', 'Interface', '---', 'ipv', 'Time', '^', 'MINOR']
   tests:
     - no-diff: [0, 1]
       info: "PASSED! LDP interface {{ pre[0] }} still {{ pre[1] }}"

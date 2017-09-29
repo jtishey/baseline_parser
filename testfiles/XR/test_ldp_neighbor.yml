@@ -3,7 +3,7 @@
   command: show mpls ldp neighbor brief
   ignore-null: False
   iterate: [all]
-  blacklist: ['Peer', '----', 'UTC']
+  blacklist: ['Peer', '----', 'UTC', '^']
   tests:
     - no-diff: [0, -2]
       info: "PASSED! {{ pre[0] }} is still has {{ pre[-2] }} addresses"

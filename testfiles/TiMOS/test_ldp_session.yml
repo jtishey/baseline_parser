@@ -3,7 +3,7 @@
   command: show router ldp session
   ignore-null: False
   iterate: [':']
-  blacklist: ['Session']
+  blacklist: ['Session', '^', 'MINOR']
   tests:
     - no-diff: [0, 2]
       info: "PASSED! LDP session {{ pre[0] }} still {{ pre[2] }}"

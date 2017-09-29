@@ -1,9 +1,9 @@
 ---
 - show_service_21_sap:
   command: show service id 21 sap
-  ignore-null: False
-  iterate: []
-  blacklist: ['====', '----', 'Summary', 'PortID', 'QoS']
+  ignore-null: True
+  iterate: [all]
+  blacklist: ['====', '----', 'Summary', 'PortID', 'QoS', '^', 'MINOR']
   tests:
     - no-diff: [0, -1, -2]
       info: "PASSED! Port {{ pre[0] }} is still {{ pre[-2] }}/{{pre[-1] }}"

@@ -1,6 +1,6 @@
 ---
 - show_isis_neighbor:
-  command:  show isis neighbor
+  command: show isis neighbor
   ignore-null: True
   iterate: [all]
   blacklist: ['Tag', 'Interface', '^']

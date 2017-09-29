@@ -3,7 +3,7 @@
   command: show router isis interface
   ignore-null: False
   iterate: [all]
-  blacklist: ['---', '===', 'Interface', 'system']
+  blacklist: ['---', '===', 'Interface', 'system', '^', 'MINOR']
   tests:
     - no-diff: [0, -1]
       info: "PASSED! ISIS interface {{ pre[0] }} metric is still {{ pre[-1] }}"

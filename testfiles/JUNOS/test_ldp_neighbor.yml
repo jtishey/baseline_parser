@@ -1,9 +1,9 @@
 ---
 - show_ldp_neighbor:
-  command:  show ldp neighbor
+  command: show ldp neighbor
   ignore-null: False
   iterate: [all]
-  blacklist: [Interface]
+  blacklist: [Interface, '^', error]
   tests:
     - no-diff: [1, 0]
       info: "PASSED! LDP adj to {{ pre[0] }} still up on {{ pre[1] }}"

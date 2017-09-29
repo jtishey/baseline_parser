@@ -1,9 +1,9 @@
 ---
 - show_rsvp_interface:
-  command:  show router rsvp interface
+  command: show router rsvp interface
   ignore-null: True
   iterate: [all]
-  blacklist: ['Interface', '---', '===', 'Sessions', 'system']
+  blacklist: ['Interface', '---', '===', 'Sessions', 'system', '^', 'MINOR:']
   tests:
     - no-diff: [0, 1, 2]
       info: "PASSED! RSVP interface {{ pre[0] }} still has {{ pre[1] }}/{{ pre[2] }} Total/Active sessions"

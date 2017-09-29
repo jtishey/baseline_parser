@@ -3,7 +3,7 @@
   command: show chassis fpc  
   ignore-null: False
   iterate: [all]
-  blacklist: [Slot, Temp]
+  blacklist: [Slot, Temp, '^', error]
   tests:
     - no-diff: [0,1]
       info: "PASSED! FPC in slot {{ pre[0] }} is still {{ pre[1] }}"

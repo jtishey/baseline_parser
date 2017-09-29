@@ -1,7 +1,7 @@
 ---
 - show_rsvp_session:
-  command:  show rsvp session
-  ignore-null: False
+  command: show rsvp session
+  ignore-null: True
   iterate: [sessions]
   blacklist: []
   tests:

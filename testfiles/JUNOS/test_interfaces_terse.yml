@@ -1,6 +1,6 @@
 ---
 - show_interfaces_terse:
-  command:  show interfaces terse
+  command: show interfaces terse
   ignore-null: False
   iterate: ['ge-', 'xe-', 'et-', 'at-', 'gr-', 'vt-', 'so-', 't3-']
   blacklist: []

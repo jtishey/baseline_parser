@@ -3,7 +3,7 @@
   command: show ip interface brief | e Vi
   ignore-null: False
   iterate: [all]
-  blacklist: [UTC, Interface]
+  blacklist: [UTC, Interface, '^']
   tests:
     - no-diff: [0, 2, 3]
       info: "PASSED! Interface {{ pre[0] }} is still {{ pre[2] }}/{{ pre[3] }}"

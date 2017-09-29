@@ -1,9 +1,9 @@
 ---
 - show_ldp_interface:
-  command:  show ldp interface 
+  command: show ldp interface 
   ignore-null: False
   iterate: [all]
-  blacklist: [Interface]
+  blacklist: [Interface, '^', error]
   tests:
     - no-diff: [0, 2]
       info: "PASSED! LDP interface {{ pre[0] }} still has {{ pre[2] }} neighbors"

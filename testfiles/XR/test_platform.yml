@@ -3,7 +3,7 @@
   command: admin show platform
   ignore-null: False
   iterate: [all]
-  blacklist: [UTC, Type, '----']
+  blacklist: [UTC, Type, '----', '^']
   tests:
     - no-diff: [0, 1]
       info: "PASSED! {{ pre[1] }} in {{ pre[0] }} is still present"

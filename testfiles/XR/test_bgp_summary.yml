@@ -1,9 +1,9 @@
 ---
 - show_bgp_summary:
-  command:  show bgp all all summary
+  command: show bgp all all summary
   ignore-null: True
   iterate: [all]
-  blacklist: ['BGP', 'Address', '----', 'P', 'p', 'Table']
+  blacklist: ['BGP', 'Address', '----', 'P', 'p', 'Table', '^']
   tests:
     - no-diff: [0, -1]
       info: "PASSED! BGP neighbor {{ pre[0] }} routes/status is still {{ pre[-1] }}"

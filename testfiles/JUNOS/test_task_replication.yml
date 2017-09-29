@@ -1,9 +1,9 @@
 ---
 - show_task_replication:
-  command:  show task replication
+  command: show task replication
   ignore-null: False
   iterate: [all]
-  blacklist: ['Stateful', 'mode:', 'Protocol']
+  blacklist: ['Stateful', 'mode:', 'Protocol', '^', error]
   tests:
     - no-diff: [0, 1]
       info: "PASSED! {{ pre[0] }} task replication is {{ pre[1] }}"

@@ -2,7 +2,7 @@
 - show_redundancy:
   command: show redundancy
   ignore-null: True
-  iterate: ['Redundancy', 'Active', '^']
+  iterate: ['Redundancy', 'Active']
   blacklist: []
   tests:
     - no-diff: [0, -1]

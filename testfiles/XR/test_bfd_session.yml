@@ -1,7 +1,7 @@
 ---
 - show_bfd_session:
   command:  show bfd session
-  ignore-null: False
+  ignore-null: True
   iterate: [UP, DOWN]
   blacklist: [ADMIN]
   tests:

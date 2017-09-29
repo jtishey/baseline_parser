@@ -1,9 +1,9 @@
 ---
 - show_bfd_session:
-  command:  show bfd session
-  ignore-null: False
+  command: show bfd session
+  ignore-null: True
   iterate: [all]
-  blacklist: [Interface, Detect, Cumulative, transmit, sessions]
+  blacklist: [Interface, Detect, Cumulative, transmit, sessions, '^', error]
   tests:
     - no-diff: [2, 1, 0]
       info: "PASSED! BFD session to {{ pre[2] }} to {{ pre[0] }} is still {{ pre[1] }}"

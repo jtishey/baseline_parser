@@ -1,6 +1,6 @@
 ---
 - show_bgp_summary:
-  command:  show bgp summary
+  command: show bgp summary
   ignore-null: False
   iterate: [Establ, Idle, Active, Open]
   blacklist: [Peer]

@@ -1,9 +1,9 @@
 ---
 - show_isis_interface:
-  command:  show isis interface
+  command: show isis interface
   ignore-null: False
   iterate: [all]
-  blacklist: [Interface, database]
+  blacklist: [Interface, database, '^', error]
   tests:
     - no-diff: [0, -1]
       info: "PASSED! ISIS interface {{ pre[0] }} metrics are still {{ pre[-1] }}"

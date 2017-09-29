@@ -1,6 +1,6 @@
 ---
 - show_router_isis_adjacency:
-  command:  show router isis adjacency 
+  command: show router isis adjacency 
   ignore-null: False
   iterate: [L2, L1]
   blacklist: []

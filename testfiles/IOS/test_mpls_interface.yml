@@ -1,6 +1,6 @@
 ---
 - show_mpls_interface:
-  command:  show mpls interface
+  command: show mpls interface
   ignore-null: True
   iterate: [all]
   blacklist: ['Interface', '^']
@@ -8,4 +8,3 @@
     - no-diff: [0, -1]
       info: "PASSED! MPLS interface {{ pre[0] }} Operational status is still {{ pre[-1] }}"
       err: "FAILED! MPLS interface {{ pre[0] }} Operational status was {{ pre[-1] }} and is now {{ post[-1] }}"
-

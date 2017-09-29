@@ -3,7 +3,7 @@
   command: show ipv6 neighbors
   ignore-null: True
   iterate: [all]
-  blacklist: [Address]
+  blacklist: [Address, '^', error]
   tests:
     - no-diff: [-1, 0]
       info: "PASSED! IPV6 Neighbor {{ pre[0] }} still on {{ pre[-1] }}"
