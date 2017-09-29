@@ -122,7 +122,7 @@ class Config(object):
         fh = logging.FileHandler(log_file)
         fh.setFormatter(msg_only_formatter)
         fh.setLevel(logging.DEBUG)
-        # Stream Handler:
+        # Stream Handler:  - set level based on verbose settings (-c -s -v)
         sh = logging.StreamHandler(sys.stdout)
         sh.setFormatter(msg_only_formatter)
         if self.verbose == 40:
@@ -154,13 +154,13 @@ class Device(object):
             self.files.append(os.path.abspath(self.config.mop_path + '/' + \
                               self.config.before_files[i]))
         except IndexError:
-            print("ERROR: No before baseline found for " + host)
+            logger.info("ERROR: No before baseline found for " + host)
             exit(1)
         try:
             self.files.append(os.path.abspath(self.config.mop_path + "/" + \
                               self.config.after_files[i]))
         except IndexError:
-            print("ERROR: No after baseline found for " + host)
+            logger.info("ERROR: No after baseline found for " + host)
             exit(1)
         os_type = subprocess.Popen(
             ["gimme", "os_type", host], stdout=subprocess.PIPE).communicate()
@@ -168,12 +168,14 @@ class Device(object):
 
 
 if __name__ == '__main__':
+    # Init config, find folder/MOP files and setup logger
     CONFIG = Config()
     CONFIG.folder_search()
     CONFIG.file_search()
     CONFIG.setup_logging()
     logger = CONFIG.logger
     
+    # One device at a time copy the config, parse, and compare
     for i, item in enumerate(CONFIG.before_files):
         hostname = str(item.split('.')[1] + '.' + item.split('.')[2])
         if CONFIG.stest and hostname not in CONFIG.stest:
@@ -192,4 +194,6 @@ if __name__ == '__main__':
             the_differentiator.Run(device)
         elif device.output.startswith('ERROR'):
             logger.info(device.output)
+    
+    #Update log file permissions
     os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
