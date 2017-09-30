@@ -56,7 +56,7 @@ class Config(object):
     def __init__(self):
         """ Init variables """
         self.mop_number, self.before_kw, self.after_kw, self.stest, self.override, self.verbose = arguments()
-        proj_path = os.path.dirname(os.path.abspath(__file__))
+        proj_path = os.path.dirname(os.path.realpath(__file__))
         with open(proj_path + '/config.yml') as _f:
             self.cfg = yaml.load(_f)
         self.mop_path = ''
