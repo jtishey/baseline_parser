@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 baseline_compare module to extract commands and output
-jtishey 2017
+jtishey 2017 
 """
 
 def run(device):

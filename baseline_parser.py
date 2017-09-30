@@ -2,7 +2,7 @@
 """
 This is a script to parse and compare info from
 a baseliner script in a managable fashon.
-jtishey 2017
+jtishey 2017 
 """
 
 import os

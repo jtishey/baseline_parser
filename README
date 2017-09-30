@@ -6,6 +6,7 @@
  Requires a seperate baseline script that collects commands
    before and after the MOP is executed.
 
+
 USAGE:
 Required arguments:
  -m / --mop     -  Specify a MOP number or tag to locate the baseline files for and run checks against

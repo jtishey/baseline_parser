@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 baseline_compare module to reuse existing log files to save resources
-jtishey 2017
+jtishey 2017 
 """
 
 

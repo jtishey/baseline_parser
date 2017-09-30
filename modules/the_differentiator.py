@@ -11,7 +11,7 @@ from modules import yaml
 
 
 class Run(object):
-    """ Run tests on the before and after commands """
+    """ Run tests on the before and after commands  """
     def __init__(self, device):
         """ Compare output of commands according to test rules
         device.output['before'] and device.output['after'] contain the outputs """
