@@ -22,7 +22,7 @@ def run(device):
 # Step 3: Split into individual commands
 def extract(device, prompt):
     """ extract commands from baselines """
-    # Open baseline files and loop through lines
+    # Open the before and after baseline files and loop through lines
     output = {}
     for each_file in device.files:
         with open(each_file) as _f:

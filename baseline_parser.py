@@ -165,6 +165,7 @@ class Device(object):
     def assign_values(self, host, i):
         """ Assign device-specific values """
         self.hostname = host
+        # self.files includes the before AND after filename for the device
         try:
             self.files.append(os.path.abspath(self.config.mop_path + '/' +
                               self.config.before_files[i]))
