@@ -58,6 +58,7 @@ class Run(object):
         line = ''
         for line in self.before_cmd_output:
             self.pass_status = 'UNSET'
+            self.delta_value = 0
             skip_line = False
             # Skip lines that include a blacklisted word
             for word in self.test_values[0]['blacklist']:
@@ -76,11 +77,14 @@ class Run(object):
             # NO-DIFF =  All indexes must match before/after
             if 'no-diff' in self.test_values[0]['tests'][0]:
                 self.no_diff(line)
+            # DELTA = Delta between 2 integers must be less than specified
+            elif 'delta' in self.test_values[0]['tests'][0]:
+                self.delta(line)
+
             # If testing didn't find a match, mark as failed
             if self.pass_status == 'UNSET':
                 self.pass_status = 'FAIL'
                 self.post = ''
-            #if self.
             self.print_result()
         self.after_only_lines()
         self.print_totals()
@@ -113,6 +117,30 @@ class Run(object):
         self.pre = line
         self.post = after_line
 
+    def delta(self, line):
+        """ Execute delta tests (identifier / index/percent)"""
+        line = line.split()
+        after_line = ''
+        line_id = self.test_values[0]['tests'][0]['delta'][0]
+        index = self.test_values[0]['tests'][0]['delta'][1]
+        max_percent = self.test_values[0]['tests'][0]['delta'][2]
+        for after_line in self.after_cmd_output:
+            after_line_orig = after_line
+            after_line = after_line.split()
+            try:
+                if line[line_id] == after_line[line_id]:
+                    self.delta_value = abs(int(line[index]) - int(after_line[index]))
+                    if self.delta_value > float(line[index]) * max_percent:
+                        self.pass_status = 'FAIL'
+                    else:
+                        self.pass_status = 'PASS'
+                    self.after_cmd_output.remove(after_line_orig)
+                    break
+            except IndexError:
+                continue
+        self.pre = line
+        self.post = after_line
+
     def print_result(self):
         """ Print and count the results """
         logger = logging.getLogger("BaselineParser")
@@ -121,13 +149,13 @@ class Run(object):
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
             if self.post == '' or self.post == []:
                 self.post = ['null'] * 12
-            logger.info(msg.render(device=self.device, pre=self.pre, post=self.post))
+            logger.info(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
         else:
             self.summary[(self.test_values[0]['command'])]['PASS'] += 1
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['info']))
             if not self.post:
                 self.post = ['null'] * 12
-            logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post))
+            logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
 
     def after_only_lines(self):
         """ Account for lines in AFTER that aren't in BEFORE """

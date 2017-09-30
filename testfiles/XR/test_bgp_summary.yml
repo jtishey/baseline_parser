@@ -5,6 +5,6 @@
   iterate: [all]
   blacklist: ['BGP', 'Address', '----', 'P', 'p', 'Table', '^']
   tests:
-    - no-diff: [0, -1]
-      info: "PASSED! BGP neighbor {{ pre[0] }} routes/status is still {{ pre[-1] }}"
-      err: "FAILED! BGP neighbor {{ pre[0] }} routes/status was {{ pre[-1] }} and is now {{ post[-1] }}"
+    - delta: [0, -1, .01]
+      info: "PASSED! BGP neighbor {{ pre[0] }} routes still within 1% of {{ pre[-1] }} ({{ delta }} changed)"
+      err: "FAILED! BGP neighbor {{ pre[0] }} routes changed > 1%, was {{ pre[-1] }} now {{ post[-1] }} ({{ delta }} changed)"

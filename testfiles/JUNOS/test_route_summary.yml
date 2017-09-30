@@ -5,6 +5,6 @@
   iterate: ['inet']
   blacklist: []
   tests:
-    - no-diff: [0, 3]
-      info: "PASSED! {{ pre[0] }} still has {{ pre[3] }} routes"
-      err: "FAILED! {{ pre[0] }} changed from {{ pre[3] }} to {{ post[3] }} routes"
+    - delta: [0, 3, .01]
+      info: "PASSED! {{ pre[0] }} within 1%, was {{ pre[3] }} now {{ post[3] }} ({{ delta }} change)"
+      err: "FAILED! {{ pre[0] }} changed > 1%, was {{ pre[3] }} now {{ post[3] }} ({{ delta }} change)"

@@ -5,6 +5,6 @@
   iterate: [Total]
   blacklist: ['^', 'MINOR']
   tests:
-    - no-diff: [0, -1]
-      info: "PASSED! Active subscribers is still {{ pre[-1] }}"
-      err: "FAILED! Active subscribers was {{ pre[-1] }} and is now {{ post[-1] }}"
+    - delta: [0, -1, .10]
+      info: "PASSED! Active subscribers within 10%, was {{ pre[-1] }} now {{ post[-1] }} ({{ delta }} change)"
+      err: "FAILED! Active subscribers changed > 10%, was {{ pre[-1] }} now {{ post[-1] }} ({{ delta }} change)"
