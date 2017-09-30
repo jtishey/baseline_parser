@@ -171,20 +171,20 @@ class Device(object):
         try:
             self.files.append(os.path.abspath(self.config.mop_path + '/' +
                               self.config.before_files[i]))
+            if self.hostname in self.config.after_files[i]:
+                self.files.append(os.path.abspath(self.config.mop_path + "/" +
+                                 self.config.after_files[i]))
+            # Issue #2 fix - device not found in after:
+            else:
+                for b_file in self.config.after_files:
+                    if self.hostname in b_file:
+                        self.files.append(os.path.abspath(self.config.mop_path + "/" + b_file))
         except IndexError:
-            self.output = "ERROR: No before baseline found for " + host
+            self.output = "ERROR: Missing baseline for " + host + "\n"
             self.skip_device = True
             return
-        if self.hostname in self.config.after_files[i]:
-            self.files.append(os.path.abspath(self.config.mop_path + "/" +
-                              self.config.after_files[i]))
-        # Issue #2 fix - device not found in after:
-        else:
-            for b_file in self.config.after_files:
-                if self.hostname in b_file:
-                    self.files.append(os.path.abspath(self.config.mop_path + "/" + b_file))
-        if len(self.files) == 1:
-            self.output = "ERROR: No after baseline found for " + host
+        if len(self.files) < 2:
+            self.output = "ERROR: Missing baseline for " + host + "\n"
             self.skip_device = True
         # 'gimme' is a shell script that returns an os_type that matches the testfile folder names
         os_type = subprocess.Popen(
