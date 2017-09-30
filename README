@@ -4,24 +4,28 @@
 
  Example usage: python baseline_parser.py -m 123456
  Requires a seperate baseline script that collects commands
-   before and after the MOP is executed.
+   before and after the change is executed.
 
+ Baseline files with pre/post outputs should be stored in the "mop_path" set in config.yml
+ Should be stored in a folder named the MOP/RFC/CR number ex. 123456
+ File names should be the device name & before/after keyword.
+ ex. /opt/ipeng/mops/YEAR_2017/01_07/123456/123456.router1.before.log
 
 USAGE:
 Required arguments:
  -m / --mop     -  Specify a MOP number or tag to locate the baseline files for and run checks against
 
 Optional arguments:
- -b / --before  -  Specify a keyword to identify "BEFORE" baseline files (default = before)
- -a / --after   -  Specify a keyword to identify "AFTER" baseline files (default = after)
- -d / --dev     -  Run checks for a single device from the baselines (default = all)
- -c / --conf    -  Display configuration diffs only (no other tests)
- -s / --summ    -  Display summary results only (Total number of passed/failed tests)
- -v / --verbose -  Display output of PASSED checks as well as FAILED checks (off by default)
- -h / --help    -  Display CLI syntax help
+  -a PRE, --after PRE   Keyword to identify "After" files (default=after)
+  -b PST, --before PST  Keyword to identify "Before" files (default=before)
+  -c, --config          Display configuration diff only
+  -d DEV, --dev DEV     Run baseline checks on a specific device only
+  -l, --log             Display no output, only log to file
+  -o, --override        Ignore previous log files and force new check
+  -s, --summary         Display summary output only
+  -v, --verbose         Display verbose output (all pass & fail)
+  -h, --help            show this help message and exit
 
-
-baseline_parser is a script to run tests agains before/after MOP baselines.
 
 Script looks for baseline files based on the MOP/RFC number (and optionally before/after keywords)
 It then seperates the commands executed during the baselines to be tested individually and displays
@@ -49,7 +53,7 @@ $ baseline_check -m 123456 -d pe01.anyw01-us,pe02.anyw01-us
 -o can be used to re-run checks and replace log file
 
 Lastly, a log file is created in the MOP baseline folder containing the verbose output on each run.
-Ex. /opt/ipeng/mops/Year_2017/Sep_01/123456/BaselineParser.log
+Ex. /mops/Year_2017/Sep_01/123456/BaselineParser.log
 
 
 
