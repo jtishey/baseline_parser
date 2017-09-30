@@ -2,7 +2,7 @@
 """
 This is a script to parse and compare info from
 a baseliner script in a managable fashon.
-jtishey 2017 
+jtishey 2017
 """
 
 import os
@@ -161,23 +161,32 @@ class Device(object):
         self.results = ''
         self.files = []
         self.output = []
+        self.skip_device = False
 
     def assign_values(self, host, i):
         """ Assign device-specific values """
         self.hostname = host
+        self.skip_device = False
         # self.files includes the before AND after filename for the device
         try:
             self.files.append(os.path.abspath(self.config.mop_path + '/' +
                               self.config.before_files[i]))
         except IndexError:
-            logger.info("ERROR: No before baseline found for " + host)
-            exit(1)
-        try:
+            self.output = "ERROR: No before baseline found for " + host
+            self.skip_device = True
+            return
+        if self.hostname in self.config.after_files[i]:
             self.files.append(os.path.abspath(self.config.mop_path + "/" +
                               self.config.after_files[i]))
-        except IndexError:
-            logger.info("ERROR: No after baseline found for " + host)
-            exit(1)
+        # Issue #2 fix - device not found in after:
+        else:
+            for b_file in self.config.after_files:
+                if self.hostname in b_file:
+                    self.files.append(os.path.abspath(self.config.mop_path + "/" + b_file))
+        if len(self.files) == 1:
+            self.output = "ERROR: No after baseline found for " + host
+            self.skip_device = True
+        # 'gimme' is a shell script that returns an os_type that matches the testfile folder names
         os_type = subprocess.Popen(
             ["gimme", "os_type", host], stdout=subprocess.PIPE).communicate()
         self.os_type = os_type[0].rstrip()
@@ -199,11 +208,11 @@ if __name__ == '__main__':
         device = Device()
         device.config = CONFIG
         device.assign_values(hostname, i)
-
-        # Get commands and output from baseline files
-        logger.info("\n\nRunning " + device.hostname)
-        logger.info("-" * 24)
-        device.output = the_extractorator.run(device)
+        if device.skip_device is False:
+            # Get commands and output from baseline files
+            logger.info("\n\nRunning " + device.hostname)
+            logger.info("-" * 24)
+            device.output = the_extractorator.run(device)
 
         # Execute the diff on the command output
         if type(device.output) is dict:
