@@ -2,8 +2,9 @@
  baseline_parser.py
 ###################
 
- Example usage: python baseline_parser.py -m 233806
- Alias Example: baseline_check -m 233806
+ Example usage: python baseline_parser.py -m 123456
+ Requires a seperate baseline script that collects commands
+   before and after the MOP is executed.
 
 USAGE:
 Required arguments:
@@ -21,19 +22,17 @@ Optional arguments:
 
 baseline_parser is a script to run tests agains before/after MOP baselines.
 
-Script looks for baseline files based on the MOP number (and optionally before/after keywords)
+Script looks for baseline files based on the MOP/RFC number (and optionally before/after keywords)
 It then seperates the commands executed during the baselines to be tested individually and displays
 output based on the results of those tests. 
 
 
 Running the script:
 -------------------------------
-An alias link has been created in server's PATH, named 'baseline_check'
-
 By default, only Failed tests are displayed, and only a MOP number is required.
 $ baseline_check -m 123456
 
-If boefore/after keywords other than 'before' & 'after' have been specified when running Pinky_Baseliner, those must also be specified:
+If boefore/after keywords other than 'before' & 'after' have been specified when running Baseliner, those must also be specified:
 $ baseline_check -m 123455 -b PRE -a POST
 
 By default, only Failed test details are displayed, to display details for all tests, use verbose flags:
@@ -43,8 +42,10 @@ For large MOPs, you may want to run tests on a specific device(s), to do this us
 $ baseline_check -m 123456 -d pe01.anyw01-us
 $ baseline_check -m 123456 -d pe01.anyw01-us,pe02.anyw01-us
 
--s can be used to display only the device summary
 -c can be used to display only the configuration diffs
+-s can be used to display only the device summaries
+-l can be used to display no output - only log to file
+-o can be used to re-run checks and replace log file
 
 Lastly, a log file is created in the MOP baseline folder containing the verbose output on each run.
 Ex. /opt/ipeng/mops/Year_2017/Sep_01/123456/BaselineParser.log
@@ -53,8 +54,7 @@ Ex. /opt/ipeng/mops/Year_2017/Sep_01/123456/BaselineParser.log
 
 Creating and Editing Testfiles:
 -------------------------------
-
-testfiles are located in '/opt/ipeng/scripts/baseline_parser/testfiles/' in a seperate folder for each OS Type
+testfiles are located in 'baseline_parser/testfiles/' in a seperate folder for each OS Type
 (JUNOS / IOS / XR / TiMOS)
 
 They are YAML files and are currently setup as follows:
@@ -79,14 +79,15 @@ iterate and blacklists are formatted as python lists ex:[value1, value2]
     blacklist words can be used to easily ignore headings for example 
 
 no-diff indicates there should be no difference in the indexes specified for before/after
+delta indicates there should be less than the specified percentage change in the specified index
 
 An index specifies a column or word in a line of output.  For example:
   A line from "show isis adjacency" might look like this:
-  ge-0/0/1.0            pe03.lncl01-ne 2  Up                   28
+  ge-0/0/1.0            vSRX1  2  Up                   28
 
 Each word is numbered, left to right, starting from 0 so:
  0 = ge-0/0/1.0
- 1 = pe03.lncl01-ne
+ 1 = vSRX1
  2 = 2
  3 = Up
  4 = 28
@@ -94,9 +95,9 @@ Each word is numbered, left to right, starting from 0 so:
 The first index listed after no-diff is used as an identifier to match on.
 In this case, we want to use 0, to run checks based on the interface, so it is specified first.
 
+For delta tests, the first index listed is used as an identifier to match on. The second
+index is the value that should be checked.  The third index is the percentage of change allowed.
 
 Once a testfile is created, it must be added to config.yml to be run.
 
-  /opt/ipeng/scripts/baseline_parser/config.yml
-
-
+  baseline_parser/config.yml

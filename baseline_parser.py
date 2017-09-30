@@ -2,7 +2,7 @@
 """
 This is a script to parse and compare info from
 a baseliner script in a managable fashon.
-John.Tishey@windstream.com 2017
+jtishey 2017
 """
 
 import os
@@ -56,8 +56,7 @@ class Config(object):
     def __init__(self):
         """ Init variables """
         self.mop_number, self.before_kw, self.after_kw, self.stest, self.override, self.verbose = arguments()
-        #proj_path = os.path.dirname(os.path.abspath(__file__))
-        proj_path = '/opt/ipeng/scripts/baseline_parser'
+        proj_path = os.path.dirname(os.path.abspath(__file__))
         with open(proj_path + '/config.yml') as _f:
             self.cfg = yaml.load(_f)
         self.mop_path = ''

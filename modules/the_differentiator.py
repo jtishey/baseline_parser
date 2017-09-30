@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 baseline_compare module to compare command output from baselines
-john.tishey@windstream.com 2017
+jtishey 2017
 """
 
 import difflib

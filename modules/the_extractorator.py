@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 """
-baseline_compare module to extract commands and output from Pinky_Baseliner
-john.tishey@windstream.com 2017
+baseline_compare module to extract commands and output
+jtishey 2017
 """
 
-# Step 1: Get the device hostname and Vendor/OS
 def run(device):
     """ Get device and baselines """
     if device.os_type == 'JUNOS':
