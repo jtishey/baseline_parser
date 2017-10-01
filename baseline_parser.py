@@ -171,13 +171,9 @@ class Device(object):
         try:
             self.files.append(os.path.abspath(self.config.mop_path + '/' +
                               self.config.before_files[i]))
-            if self.hostname in self.config.after_files[i]:
-                self.files.append(os.path.abspath(self.config.mop_path + "/" +
-                                 self.config.after_files[i]))
-            else:
-                for b_file in self.config.after_files:
-                    if self.hostname in b_file:
-                        self.files.append(os.path.abspath(self.config.mop_path + "/" + b_file))
+            for item in self.config.after_files:
+                if self.hostname in item:
+                    self.files.append(os.path.abspath(self.config.mop_path + "/" + item))
         except IndexError:
             pass
         if len(self.files) < 2:
