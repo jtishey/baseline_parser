@@ -37,6 +37,7 @@ def extract(device, prompt):
                 if line[-1] != '>' or line[-1] != '#':
                     line = line.replace(prompt + '-re0>', '')
                     line = line.replace(prompt + '-re1>', '')
+                    line = line.replace(prompt + '>', '')
                     line = line.replace('A' + prompt, '')
                     line = line.replace('B' + prompt, '')
                     line = line.replace(prompt, '')
