@@ -3,7 +3,7 @@
   command: show pim neighbors
   ignore-null: True
   iterate: [all]
-  blacklist: ['=', 'Instance', 'Instance:', 'Interface', '^', error]
+  blacklist: ['=', 'Instance', 'Instance:', 'Interface', '^', error, not]
   tests:
     - no-diff: [0]
       info: "PASSED! PIM nieghbor still on interface {{ pre[0] }}"
