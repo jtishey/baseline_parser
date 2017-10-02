@@ -28,7 +28,8 @@ class Run(object):
                     dev_flag = True
                 else:
                     dev_flag = False
-            elif 'Command: show run' in line or 'Command: show config' in line:
+            elif 'Command: show run' in line or 'Command: show config' in line or \
+                                  'Command: admin display-config' in line:
                 cfg_flag = True
             elif 'Testing ping commands' in line:
                 cfg_flag = False
