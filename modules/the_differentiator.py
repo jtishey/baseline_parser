@@ -129,13 +129,21 @@ class Run(object):
             after_line = after_line.split()
             try:
                 if line[line_id] == after_line[line_id]:
-                    self.delta_value = abs(int(line[index]) - int(after_line[index]))
-                    if self.delta_value > float(line[index]) * max_percent:
-                        self.pass_status = 'FAIL'
+                    if line[index].isdigit() and after_line[index].isdigit():
+                        self.delta_value = abs(int(line[index]) - int(after_line[index]))
+                        if self.delta_value > float(line[index]) * max_percent:
+                            self.pass_status = 'FAIL'
+                        else:
+                            self.pass_status = 'PASS'
+                        self.after_cmd_output.remove(after_line_orig)
+                        break
                     else:
-                        self.pass_status = 'PASS'
-                    self.after_cmd_output.remove(after_line_orig)
-                    break
+                        if line[index] == after_line[index]:
+                            self.pass_status = 'PASS'
+                        else:
+                            self.pass_status = 'FAIL'
+                        self.after_cmd_output.remove(after_line_orig)
+                        break
             except IndexError:
                 continue
         self.pre = line
@@ -209,6 +217,7 @@ class Run(object):
             after_cfg = self.device.output['after'][(cmds[self.device.os_type])]
         except KeyError:
             logger.info("ERROR: " + (cmds[self.device.os_type] + " not found in baseline\n"))
+            self.summary['show configuration']['FAIL'] = 1
             return
 
         diff = difflib.unified_diff(before_cfg, after_cfg)
