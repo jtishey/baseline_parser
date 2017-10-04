@@ -3,7 +3,7 @@
   command: show rsvp int
   ignore-null: True
   iterate: [all]
-  blacklist: ['Interface', 'UTC', '---', '^']
+  blacklist: ['Interface', 'UTC', 'RSVP', '---', '^']
   tests:
     - no-diff: [0, 1]
       info: "PASSED! RSVP interface {{ pre[0] }} is still {{ pre[1] }}"

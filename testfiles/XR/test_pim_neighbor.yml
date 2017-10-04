@@ -3,7 +3,7 @@
   command: show pim neighbor
   ignore-null: True
   iterate: [all]
-  blacklist: ['neighbors', 'UTC', '---', '^']
+  blacklist: ['eighbor', 'UTC', '---', '^']
   tests:
     - no-diff: [0, 1]
       info: "PASSED! PIM neighbor on {{ pre[0] }} is still {{ pre[1] }}"
