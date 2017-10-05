@@ -101,10 +101,19 @@ class Run(object):
     def no_diff(self, line):
         """ Execute no-diff tests (indicating all indexes match before/after)"""
         after_line = ''
+        wrap_word = ''
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
-        for after_line in self.after_cmd_output:
+        print line
+        for i, after_line in enumerate(self.after_cmd_output):
+            if wrap_word == self.after_cmd_output[i - 1]:
+                after_line = wrap_word + ' ' + after_line
+            wrap_word = ''
             after_line_orig = after_line
             after_line = after_line.split()
+            if len(after_line) == 1:
+                if self.after_cmd_output[i + 1][:4] == '    ':
+                    wrap_word = after_line[0]
+                    continue
             try:
                 if line[line_id] == after_line[line_id]:
                     for index in self.test_values[0]['tests'][0]['no-diff']:
@@ -118,6 +127,8 @@ class Run(object):
                     # If it looped through indexes without failing, mark as pass
                     if self.pass_status == 'UNSET':
                         self.pass_status = 'PASS'
+                    if self.after_cmd_output == wrap_word:
+                        del self.after_cmd_output[i - 1]
                     self.after_cmd_output.remove(after_line_orig)
                     break
             except IndexError:
