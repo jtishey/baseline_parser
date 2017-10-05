@@ -7,4 +7,4 @@
   tests:
     - no-diff: [0, 1]
       info: "PASSED! LDP session on {{ pre[0] }} is still {{ pre[1] }}"
-      err: "FAILED! LDP session on {{ pre[0] }} failed check"
+      err: "FAILED! LDP session on {{ pre[0] }} was {{ pre[1] }} and is now {{ post[1] }}"

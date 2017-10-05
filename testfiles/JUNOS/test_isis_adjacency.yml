@@ -7,4 +7,4 @@
   tests:
     - no-diff: [0,1,3]
       info: "PASSED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} is still {{ pre[3] }}"
-      err: "FAILED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} failed check"
+      err: "FAILED! ISIS adj to {{ pre[1] }} on {{ pre[0] }} was {{ pre[3] }} and is now {{ post[3] }}"

@@ -7,4 +7,4 @@
   tests:
     - no-diff: [0, 1, 2]
       info: "PASSED! RSVP still {{ pre[1] }} on {{ pre[0] }} with {{ pre[2] }} active reservations"
-      err: "FAILED! RSVP interface {{ pre[0] }} was {{ pre[1] }}/{{ pre[2] }} reservations, and is now {{ pre[1] }}/{{ pre[2] }} reservations"
+      err: "FAILED! RSVP interface {{ pre[0] }} was {{ pre[1] }}/{{ pre[2] }} reservations, and is now {{ post[1] }}/{{ post[2] }} reservations"

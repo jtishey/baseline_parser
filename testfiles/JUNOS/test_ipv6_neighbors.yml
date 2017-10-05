@@ -6,5 +6,5 @@
   blacklist: [Address, '^', error]
   tests:
     - no-diff: [-1, 0]
-      info: "PASSED! IPV6 Neighbor {{ pre[0] }} still on {{ pre[-1] }}"
-      err: "FAILED! IPV6 Neighbor {{ pre[0] }} interface {{ pre[-1] }} changed to {{ post[-1] }}"
+      info: "PASSED! IPV6 Interface {{ pre[-1] }} still has Neighbor {{ pre[0] }}"
+      err: "FAILED! IPV6 Interface {{ pre[-1] }} Neighbor was {{ pre[0] }} and is now {{ post[0] }}"

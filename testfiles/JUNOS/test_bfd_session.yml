@@ -7,4 +7,4 @@
   tests:
     - no-diff: [2, 1, 0]
       info: "PASSED! BFD session to {{ pre[2] }} to {{ pre[0] }} is still {{ pre[1] }}"
-      err: "FAILED! BGP session to {{ pre[2] }} changed from {{ pre[1] }}:{{ pre[2] }} to {{ post[1] }}:{{ post[2] }}"
+      err: "FAILED! BFD session to {{ pre[2] }} changed from {{ pre[1] }} to {{ post[1] }}"

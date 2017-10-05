@@ -6,6 +6,6 @@
   blacklist: [Interface, '^', error]
   tests:
     - no-diff: [1, 0]
-      info: "PASSED! LDP adj to {{ pre[0] }} still up on {{ pre[1] }}"
-      err: "FAILED! LDP adj to {{ pre[0] }} on {{ pre[1] }} failed check"
+      info: "PASSED! LDP adj on {{ pre[1] }} still up to {{ pre[0] }}"
+      err: "FAILED! LDP adj on {{ pre[1] }} was {{ pre[0] }} and is now {{ post[0] }}"
 
