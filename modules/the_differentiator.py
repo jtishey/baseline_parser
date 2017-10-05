@@ -103,7 +103,6 @@ class Run(object):
         after_line = ''
         wrap_word = ''
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
-        print line
         for i, after_line in enumerate(self.after_cmd_output):
             if wrap_word == self.after_cmd_output[i - 1]:
                 after_line = wrap_word + ' ' + after_line
