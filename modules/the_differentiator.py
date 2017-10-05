@@ -181,8 +181,13 @@ class Run(object):
                             skip_line = True
                 if not skip_line:
                     self.summary[(self.test_values[0]['command'])]['FAIL'] += 1
-                    self.pre = after_line.split()
-                    self.post = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
+                    self.post = after_line.split()
+                    self.pre = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
+                    if self.test_values[0]['tests'][0]['no-diff']:
+                        line_id = self.test_values[0]['tests'][0]['no-diff'][0]
+                    else:
+                        line_id = self.test_values[0]['tests'][0]['delta'][0]
+                    self.pre[line_id] = self.post[line_id]
                     msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
                     logger.info(msg.render(device=self.device, pre=self.pre, post=self.post))
 
