@@ -56,10 +56,14 @@ class Run(object):
         logger.info("******** Command: " + self.test_values[0]['command'] + " ********")
         self.summary[(self.test_values[0]['command'])] = {'PASS': 0, 'FAIL': 0}
         line = ''
-        for line in self.before_cmd_output:
+        wrap_word = ''
+        for i, line in enumerate(self.before_cmd_output):
             self.pass_status = 'UNSET'
             self.delta_value = 0
             skip_line = False
+            if wrap_word == self.before_cmd_output[i - 1]:
+                line = wrap_word + ' ' + line
+            wrap_word = ''
             # Skip lines that include a blacklisted word
             for word in self.test_values[0]['blacklist']:
                 if word in line:
@@ -74,6 +78,11 @@ class Run(object):
                     skip_line = True
             if skip_line:
                 continue
+            line = line.split()
+            if len(line) == 1:
+                if self.before_cmd_output[i + 1][:4] == '    ':
+                    wrap_word = line[0]
+                    continue
             # NO-DIFF =  All indexes must match before/after
             if 'no-diff' in self.test_values[0]['tests'][0]:
                 self.no_diff(line)
@@ -91,7 +100,6 @@ class Run(object):
 
     def no_diff(self, line):
         """ Execute no-diff tests (indicating all indexes match before/after)"""
-        line = line.split()
         after_line = ''
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
         for after_line in self.after_cmd_output:
@@ -119,7 +127,6 @@ class Run(object):
 
     def delta(self, line):
         """ Execute delta tests (identifier / index/percent)"""
-        line = line.split()
         after_line = ''
         line_id = self.test_values[0]['tests'][0]['delta'][0]
         index = self.test_values[0]['tests'][0]['delta'][1]
