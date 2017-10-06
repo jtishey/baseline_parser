@@ -3,8 +3,8 @@
   command: show ip bgp all summary
   ignore-null: True
   iterate: [all]
-  blacklist: ['BGP', 'address', 'memory', 'Neighbor', 'configuration', '^']
+  blacklist: ['BGP', 'address', 'memory', 'Neighbor', 'configuration', '^', Active, Idle, Closing]
   tests:
-    - no-diff: [0, -1]
-      info: "PASSED! BGP neighbor {{ pre[0] }} routes/status is still {{ pre[-1] }}"
-      err: "FAILED! BGP neighbor {{ pre[0] }} routes/status was {{ pre[-1] }} and is now {{ post[-1] }}"
+    - delta: [0, -1, .01]
+      info: "PASSED! BGP neighbor {{ pre[0] }} within 1%, was {{ pre[-1] }} now {{ post[-1] }} ({{ delta }} change)"
+      err: "FAILED! BGP neighbor {{ pre[0] }} changed > 1%, was {{ pre[-1] }} now {{ post[-1] }} ({{ delta }} change)"

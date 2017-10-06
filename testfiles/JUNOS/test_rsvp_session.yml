@@ -7,4 +7,4 @@
   tests:
     - no-diff: [0, 2]
       info: "PASSED! RSVP still has {{ pre[2] }} {{ pre[0] }} sessions"
-      err: "FAILED! RSVP still had {{ pre[2] }} {{ pre[0] }} sessions, and now has {{ post[2] }}"
+      err: "FAILED! RSVP had {{ pre[2] }} {{ pre[0] }} sessions, and now has {{ post[2] }}"
