@@ -1,7 +1,7 @@
 ---
 - show_task_replication:
   command: show task replication
-  ignore-null: False
+  ignore-null: True
   iterate: [all]
   blacklist: ['Stateful', 'mode:', 'Protocol', '^', error]
   tests:
