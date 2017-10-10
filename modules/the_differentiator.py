@@ -127,7 +127,6 @@ class Run(object):
                     if self.pass_status == 'UNSET':
                         self.pass_status = 'PASS'
                     if self.after_cmd_output[i - 1] == after_line[0]:
-                        print wrap_word
                         del self.after_cmd_output[i - 1]
                     self.after_cmd_output.remove(after_line_orig)
                     break
