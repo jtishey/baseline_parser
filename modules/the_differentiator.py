@@ -278,7 +278,7 @@ class Run(object):
         diff = difflib.unified_diff(before_cfg, after_cfg)
         cfg_diff = '\n'.join(diff)
         if cfg_diff:
-            logger.info("FAILED! " + self.device.hostname + " configuation changed")
+            logger.info("FAILED! " + self.device.hostname + " configuation changed (use -c to view)")
             for line in cfg_diff.splitlines():
                 if '@@' in line:
                     line = '=' * 36
