@@ -31,21 +31,21 @@ def arguments():
     args = vars(p.parse_args())
     tag1, tag2, stest, override, verbose = 'before', 'after', [], False, 0
     mop = args['mop']
-    if args['verbose']:
-        verbose = args['verbose']
     if args['before']:
         tag1 = args['before']
     if args['after']:
         tag2 = args['after']
+    if args['verbose']:
+        verbose = args['verbose']
     if  args['config']:
         verbose = 20
     if args['summary']:
         verbose = 40
+    if args['log']:
+        verbose = 60
     if args['dev']:
         for device in  args['dev'].split(','):
             stest.append(device)
-    if args['log']:
-        verbose = 60
     if args['override']:
         override = True
     return mop, tag1, tag2, stest, override, verbose
