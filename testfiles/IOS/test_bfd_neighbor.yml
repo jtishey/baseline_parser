@@ -3,7 +3,7 @@
   command: show bfd neighbor
   ignore-null: True
   iterate: [all]
-  blacklist: ['Addr', '^']
+  blacklist: [Addr, '^', eighbor]
   tests:
     - no-diff: [-1, -2]
       info: "PASSED! BFD neighbor on {{ pre[-1] }} is still {{ pre[-2] }}"
