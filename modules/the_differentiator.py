@@ -199,10 +199,13 @@ class Run(object):
                 if wrap_word:
                     after_line = wrap_word + ' ' + after_line
                 wrap_word = ''
-                if len(after_line.split()) == 1:
-                    if self.after_cmd_output[i + 1][:4] == '    ':
-                        wrap_word = after_line.split()[0]
-                        continue
+                try:
+                    if len(after_line.split()) == 1:
+                        if self.after_cmd_output[i + 1][:4] == '    ':
+                            wrap_word = after_line.split()[0]
+                            continue
+                except:
+                    wrap_word = ''
                 # If an iterator is set, skip lines that don't have the iterator
                 if self.test_values[0]['iterate'] != ['all']:
                     for word in self.test_values[0]['iterate']:
@@ -228,11 +231,14 @@ class Run(object):
         if wrap_word:
             after_line = wrap_word + ' ' + after_line
         wrap_word = ''
-        after_line = after_line.split()
-        if len(after_line) == 1:
-            if after_output[i + 1][:4] == '    ':
-                wrap_word = after_line[0]
-                cont_flag = True
+        try:
+            after_line = after_line.split()
+            if len(after_line) == 1:
+                if after_output[i + 1][:4] == '    ':
+                    wrap_word = after_line[0]
+                    cont_flag = True
+        except:
+            conf_flag = False
         return after_line, wrap_word, cont_flag
 
     def print_totals(self):
