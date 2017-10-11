@@ -271,7 +271,7 @@ class Run(object):
             before_cfg = self.device.output['before'][(cmds[self.device.os_type])]
             after_cfg = self.device.output['after'][(cmds[self.device.os_type])]
         except KeyError:
-            logger.info("ERROR: " + (cmds[self.device.os_type] + " not found in baseline\n"))
+            logger.info("ERROR: " + (cmds[self.device.os_type] + " not found in " + self.device.hostname + " baseline\n"))
             self.summary['show configuration']['FAIL'] = 1
             return
 
