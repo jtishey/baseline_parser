@@ -122,8 +122,8 @@ class Run(object):
                     # If it looped through indexes without failing, mark as pass
                     if self.pass_status == 'UNSET':
                         self.pass_status = 'PASS'
-                    if self.after_cmd_output[i - 1] == after_line[0]:
-                        del self.after_cmd_output[i - 1]
+                    if len(after_line_orig.split()) < len(after_line):
+                        self.after_cmd_output.remove(after_line[0])
                     self.after_cmd_output.remove(after_line_orig)
                     break
             except IndexError:
@@ -152,8 +152,6 @@ class Run(object):
                             self.pass_status = 'FAIL'
                         else:
                             self.pass_status = 'PASS'
-                        self.after_cmd_output.remove(after_line_orig)
-                        break
                     else:
                         if line[index] == after_line[index]:
                             self.pass_status = 'PASS'
@@ -161,8 +159,10 @@ class Run(object):
                         else:
                             self.pass_status = 'FAIL'
                             self.delta_value = '100%'
-                        self.after_cmd_output.remove(after_line_orig)
-                        break
+                    if len(after_line_orig.split()) < len(after_line):
+                        self.after_cmd_output.remove(after_line[0])
+                    self.after_cmd_output.remove(after_line_orig)
+                    break
             except IndexError:
                 continue
         self.pre = line
@@ -188,11 +188,21 @@ class Run(object):
         """ Account for lines in AFTER that aren't in BEFORE """
         logger = logging.getLogger("BaselineParser")
         if len(self.after_cmd_output) > 0:
-            for after_line in self.after_cmd_output:
+            wrap_word = ''
+            for i, after_line in enumerate(self.after_cmd_output):
                 skip_line = False
+                # If blacklist is set, skip those lines
                 for word in self.test_values[0]['blacklist']:
                     if word in after_line:
                         skip_line = True
+                # Fix word wrap
+                if wrap_word:
+                    after_line = wrap_word + ' ' + after_line
+                wrap_word = ''
+                if len(after_line.split()) == 1:
+                    if self.after_cmd_output[i + 1][:4] == '    ':
+                        wrap_word = after_line.split()[0]
+                        continue
                 # If an iterator is set, skip lines that don't have the iterator
                 if self.test_values[0]['iterate'] != ['all']:
                     for word in self.test_values[0]['iterate']:
@@ -222,7 +232,6 @@ class Run(object):
         if len(after_line) == 1:
             if after_output[i + 1][:4] == '    ':
                 wrap_word = after_line[0]
-                self.after_cmd_output.remove(after_line_orig)
                 cont_flag = True
         return after_line, wrap_word, cont_flag
 
