@@ -201,11 +201,12 @@ if __name__ == '__main__':
         device = Device()
         device.config = CONFIG
         device.assign_values(hostname, i)
-        if device.skip_device is False:
-            # Get commands and output from baseline files
-            logger.info("\n\nRunning " + device.hostname)
-            logger.info("-" * 24)
-            device.output = the_extractorator.run(device)
+        if device.skip_device is True:
+            continue
+        # Get commands and output from baseline files
+        logger.info("\n\nRunning " + device.hostname)
+        logger.info("-" * 24)
+        device.output = the_extractorator.run(device)
 
         # Execute the diff on the command output
         if type(device.output) is dict:
