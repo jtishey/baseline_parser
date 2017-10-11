@@ -102,17 +102,13 @@ class Run(object):
         """ Execute no-diff tests (indicating all indexes match before/after)"""
         after_line = ''
         wrap_word = ''
+        after_output = self.after_cmd_output[:]
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
-        for i, after_line in enumerate(self.after_cmd_output):
+        for i, after_line in enumerate(after_output):
             after_line_orig = after_line
-            if wrap_word == self.after_cmd_output[i - 1]:
-                after_line = wrap_word + ' ' + after_line
-            wrap_word = ''
-            after_line = after_line.split()
-            if len(after_line) == 1:
-                if self.after_cmd_output[i + 1][:4] == '    ':
-                    wrap_word = after_line[0]
-                    continue
+            after_line, wrap_word, wrap = self.fix_word_wrap(wrap_word, after_line, after_output, i)
+            if wrap is True:
+                continue
             try:
                 if line[line_id] == after_line[line_id]:
                     for index in self.test_values[0]['tests'][0]['no-diff']:
@@ -138,12 +134,16 @@ class Run(object):
     def delta(self, line):
         """ Execute delta tests (identifier / index/percent)"""
         after_line = ''
+        wrap_word = ''
+        after_output = self.after_cmd_output[:]
         line_id = self.test_values[0]['tests'][0]['delta'][0]
         index = self.test_values[0]['tests'][0]['delta'][1]
         max_percent = self.test_values[0]['tests'][0]['delta'][2]
-        for after_line in self.after_cmd_output:
+        for i, after_line in enumerate(after_output):
             after_line_orig = after_line
-            after_line = after_line.split()
+            after_line, wrap_word, wrap = self.fix_word_wrap(wrap_word, after_line, after_output, i)
+            if wrap is True:
+                continue
             try:
                 if line[line_id] == after_line[line_id]:
                     if line[index].isdigit() and after_line[index].isdigit():
@@ -210,6 +210,21 @@ class Run(object):
                     self.pre[line_id] = self.post[line_id]
                     msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
                     logger.info(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
+
+    def fix_word_wrap(self, wrap_word, after_line, after_output, i):
+        """ Check line for signs of word wrap and fix if detected """
+        after_line_orig = after_line
+        cont_flag = False
+        if wrap_word:
+            after_line = wrap_word + ' ' + after_line
+        wrap_word = ''
+        after_line = after_line.split()
+        if len(after_line) == 1:
+            if after_output[i + 1][:4] == '    ':
+                wrap_word = after_line[0]
+                self.after_cmd_output.remove(after_line_orig)
+                cont_flag = True
+        return after_line, wrap_word, cont_flag
 
     def print_totals(self):
         """ Print command test results for all lines of that command output """
