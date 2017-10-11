@@ -5,7 +5,7 @@ jtishey 2017
 """
 
 def run(device):
-    """ Get device and baselines """
+    """ Get device prompt and call the extract function """
     if device.os_type == 'JUNOS':
         prompt = 'deip@' + device.hostname
     elif device.os_type == 'IOS':
@@ -19,7 +19,7 @@ def run(device):
     output = extract(device, prompt)
     return output
 
-# Step 3: Split into individual commands
+# Split into individual commands
 def extract(device, prompt):
     """ extract commands from baselines """
     # Open the before and after baseline files and loop through lines
