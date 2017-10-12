@@ -22,7 +22,7 @@ class Run(object):
         self.pre, self.post = '', ''
         self.pass_status = ''
         self.summary = {}
-        if self.device.config.verbose == 20:
+        if self.device.config.verbose == 61:
             self.config_diff()
             return
 
@@ -39,13 +39,13 @@ class Run(object):
                 with open(self.test_path + '/' + test_case) as _f:
                     self.test_values = yaml.load(_f.read())
             except:
-                logger.info("ERROR: Could not load " + self.test_path + '/' + test_case)
+                logger.error("ERROR:  Could not load " + self.test_path + '/' + test_case)
                 continue
             try:
                 self.before_cmd_output = self.device.output['before'][(self.test_values[0]['command'])]
                 self.after_cmd_output = self.device.output['after'][(self.test_values[0]['command'])]
             except KeyError:
-                logger.info("ERROR: " + self.test_values[0]['command'] + " not found in the baseline!\n")
+                logger.warn("ERROR:  " + self.test_values[0]['command'] + " not found in the baseline!")
                 continue
             self.test_cmd_output()
 
@@ -176,7 +176,7 @@ class Run(object):
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
             if self.post == '' or self.post == []:
                 self.post = ['null'] * 12
-            logger.info(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
+            logger.warn(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
         else:
             self.summary[(self.test_values[0]['command'])]['PASS'] += 1
             msg = jinja2.Template(str(self.test_values[0]['tests'][0]['info']))
@@ -222,7 +222,7 @@ class Run(object):
                         self.delta_value = '100%'
                     self.pre[line_id] = self.post[line_id]
                     msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
-                    logger.info(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
+                    logger.warn(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
 
     def fix_word_wrap(self, wrap_word, after_line, after_output, i):
         """ Check line for signs of word wrap and fix if detected """
@@ -271,14 +271,14 @@ class Run(object):
             before_cfg = self.device.output['before'][(cmds[self.device.os_type])]
             after_cfg = self.device.output['after'][(cmds[self.device.os_type])]
         except KeyError:
-            logger.info("ERROR: " + (cmds[self.device.os_type] + " not found in " + self.device.hostname + " baseline\n"))
+            logger.error("ERROR: " + (cmds[self.device.os_type] + " not found in " + self.device.hostname + " baseline\n"))
             self.summary['show configuration']['FAIL'] = 1
             return
 
         diff = difflib.unified_diff(before_cfg, after_cfg)
         cfg_diff = '\n'.join(diff)
         if cfg_diff:
-            logger.info("FAILED! " + self.device.hostname + " configuation changed (use -c to view)")
+            logger.warn("FAILED! Configuration changed for " + self.device.hostname + " (use -c to view)")
             for line in cfg_diff.splitlines():
                 if '@@' in line:
                     line = '=' * 36
@@ -344,7 +344,7 @@ class Run(object):
                 found_match = True
                 break
         if not found_match:
-            logger.info("FAILED! " + self.ping_test + " not found in the after baseline")
+            logger.warn("FAILED! " + self.ping_test + " not found in the after baseline")
             self.ping_totals['FAIL'] += 1
             return
         # Standardize output across platforms
@@ -358,7 +358,7 @@ class Run(object):
                  '% success before and after')
             self.ping_totals['PASS'] += 1
         else:
-            logger.info("FAILED! " + self.ping_test  + " pre=" + \
+            logger.warn("FAILED! " + self.ping_test  + " pre=" + \
                str(line[match_index]) + "% post=" + str(after_line[match_index]) + "% success")
             self.ping_totals['FAIL'] += 1
 
@@ -373,9 +373,10 @@ class Run(object):
             if self.summary[command]['FAIL'] > 0:
                 failed += 1
                 failed_list.append(command)
-        logger.warn(self.device.hostname + ' totals: \n'+ ('*' * 46) + '\n' + \
+        logger.error("\n" + self.device.hostname + ' totals: \n'+ ('*' * 46) + '\n' + \
                     '  PASSED: ' + str(passed) + ' FAILED: ' + str(failed))
+        logger.error('  ---------------------')
         for test in failed_list:
             fail_cnt = self.summary[test]['FAIL']
-            logger.warn("  Failed - " + str(fail_cnt) + ' lines - ' + str(test))
-        logger.warn("\n")
+            logger.error("  Failed - " + str(fail_cnt) + ' lines - ' + str(test))
+        logger.error("\n")

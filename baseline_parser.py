@@ -25,24 +25,29 @@ def arguments():
     p.add_argument('-c', '--config', action='count', default=0, help='Display configuration diff only')
     p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only', metavar='DEV')
     p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log to file')
+    p.add_argument('-q', '--quiet', action='count', default=0, help='Display quiet output - Only shows failed tests')
     p.add_argument('-o', '--override', action='count', default=0, help='Ignore previous log files and force new check')
     p.add_argument('-s', '--summary', action='count', default=0, help='Display summary output only')
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
-    tag1, tag2, stest, override, verbose = 'before', 'after', [], False, 0
+    tag1, tag2, stest, override, verbose = 'before', 'after', [], False, 20
     mop = args['mop']
     if args['before']:
         tag1 = args['before']
     if args['after']:
         tag2 = args['after']
-    if args['verbose']:
-        verbose = args['verbose']
-    if  args['config']:
-        verbose = 20
-    if args['summary']:
-        verbose = 40
-    if args['log']:
+    if args['verbose']:    # VERBOSITY LEVELS:
+        verbose = 10       # 10 = DEBUG    / VERBOSE
+    #   default = 20       # 20 = INFO     / DEFAULT
+    if args['quiet']:      # 30 = WARN     / QUIET
+        verbose = 30       # 40 = ERROR    / SUMMARY
+    if args['summary']:    # 50 = CRITICAL / unused
+        verbose = 40       #########################
+    # CUSTOM VALUES:       # 60 = LOG ONLY
+    if args['log']:        # 61 = CONFIG ONLY
         verbose = 60
+    if  args['config']:
+        verbose = 61
     if args['dev']:
         for device in  args['dev'].split(','):
             stest.append(device)
@@ -140,13 +145,11 @@ class Config(object):
         # Stream Handler:  - set level based on verbose settings (-c -s -v)
         sh = logging.StreamHandler(sys.stdout)
         sh.setFormatter(msg_only_formatter)
-        if self.verbose == 40:
-            sh.setLevel(logging.WARN)
-        elif self.verbose > 0:
-            sh.setLevel(logging.DEBUG)
+        if self.verbose < 50:
+            sh.setLevel(self.verbose)
         else:
-            sh.setLevel(logging.INFO)
-
+            #set debug for config only
+            sh.setLevel(10)
         self.logger.addHandler(fh)
         if self.verbose != 60:
             self.logger.addHandler(sh)
@@ -204,15 +207,15 @@ if __name__ == '__main__':
         if device.skip_device is True:
             continue
         # Get commands and output from baseline files
-        logger.info("\n\nRunning " + device.hostname)
-        logger.info("-" * 24)
+        logger.warn("\n\nRunning " + device.hostname)
+        logger.warn("-" * 24)
         device.output = the_extractorator.run(device)
 
         # Execute the diff on the command output
         if type(device.output) is dict:
             the_differentiator.Run(device)
         else:
-            logger.info(device.output)
+            logger.error(device.output)
 
     # Update log file permissions
     os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
