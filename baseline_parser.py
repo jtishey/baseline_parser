@@ -24,6 +24,7 @@ def arguments():
     p.add_argument('-b', '--before', help='Keyword to identify "Before" files (default=before)', metavar='PST')
     p.add_argument('-c', '--config', action='count', default=0, help='Display configuration diff only')
     p.add_argument('-d', '--dev', help='Run baseline checks on a specific device only', metavar='DEV')
+    p.add_argument('-f', '--file', help='Specify a different config file (default=config.yml)')
     p.add_argument('-l', '--log', action='count', default=0, help='Display no output, only log to file')
     p.add_argument('-q', '--quiet', action='count', default=0, help='Display quiet output - Only shows failed tests')
     p.add_argument('-o', '--override', action='count', default=0, help='Ignore previous log files and force new check')
@@ -31,6 +32,7 @@ def arguments():
     p.add_argument('-v', '--verbose', action='count', default=0, help='Display verbose output')
     args = vars(p.parse_args())
     tag1, tag2, stest, override, verbose = 'before', 'after', [], False, 20
+    cfg = os.path.dirname(os.path.realpath(__file__)) + '/config.yml'
     mop = args['mop']
     if args['before']:
         tag1 = args['before']
@@ -51,18 +53,25 @@ def arguments():
     if args['dev']:
         for device in  args['dev'].split(','):
             stest.append(device)
+    if args['file']:
+        cfg = args['file']
     if args['override']:
         override = True
-    return mop, tag1, tag2, stest, override, verbose
+    return mop, tag1, tag2, stest, cfg, override, verbose
 
 
 class Config(object):
     """ Variables used by all devices """
     def __init__(self):
         """ Init variables """
-        self.mop_number, self.before_kw, self.after_kw, self.stest, self.override, self.verbose = arguments()
-        proj_path = os.path.dirname(os.path.realpath(__file__))
-        with open(proj_path + '/config.yml') as _f:
+        self.mop_number, self.before_kw, self.after_kw, self.stest, cfg_file, self.override, self.verbose = arguments()
+        if not os.path.exists(cfg_file):
+            if os.path.exists(os.path.dirname(os.path.realpath(__file__)) + '/' + cfg_file):
+                cfg_file = os.path.dirname(os.path.realpath(__file__)) + '/' + cfg_file
+            else:
+                print("ERROR: Unable to open config file")
+                exit(1)
+        with open(cfg_file) as _f:
             self.cfg = yaml.load(_f)
         self.mop_path = ''
         self.before_files = []
