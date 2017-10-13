@@ -19,9 +19,10 @@ class Run(object):
 
         print("Using log file from previous check, use -o to override and run new checks\n")
 
+        output = ''
         sum_flag, cfg_flag, dev_flag = False, False, False
         for line in prev_run:
-            line = line.rstrip()
+            #line = line.rstrip()
             if line.startswith('Running'):
                 sum_flag = False
                 if line.split()[1] in CONFIG.stest:
@@ -41,19 +42,29 @@ class Run(object):
                 dev_flag = True
 
             if dev_flag is True:
-                #VERBOSE = 1
-                if CONFIG.verbose == 1:
-                    print(line)
-                # NORMAL = 0
-                elif CONFIG.verbose == 0:
-                    if line.startswith('PASSED') is False:
-                        print(line)
-                # CCONFIG = 20
+                # VERBOSE = 10
+                if CONFIG.verbose == 10:
+                    output = output + line
+                # NORMAL = 20
                 elif CONFIG.verbose == 20:
+                    if line.startswith('PASSED') is False:
+                        output = output + line
+                # QUIET = 30
+                elif CONFIG.verbose == 30:
+                    if sum_flag is False:
+                        if line[:5] not in ['PASSE', 'PASS!', 'FAIL!']:
+                            if cfg_flag is False and line[:9] != '******** ':
+                                output = output + line
+                # CCONFIG = 61
+                elif CONFIG.verbose == 61:
                     if cfg_flag is True:
-                        print(line)
+                        output = output + line
                 # SUMMARY = 40
                 elif CONFIG.verbose == 40:
                     if sum_flag is True:
-                        print(line)
+                        output = output + line
+        while '\n\n\n' in output:
+            output = output.replace("\n\n", "\n")
+        output = output.replace('Running ', '\nRunning ')
+        print output
         exit()
