@@ -46,10 +46,10 @@ def arguments():
     if args['summary']:    # 50 = CRITICAL / unused
         verbose = 40       #########################
     # CUSTOM VALUES:       # 60 = LOG ONLY
-    if args['log']:        # 61 = CONFIG ONLY
-        verbose = 60
-    if  args['config']:
+    if  args['config']:    # 61 = CONFIG ONLY
         verbose = 61
+    if args['log']: 
+        verbose = 60
     if args['dev']:
         for device in  args['dev'].split(','):
             stest.append(device)
@@ -132,35 +132,44 @@ class Config(object):
             except:
                 continue
         if len(self.before_files) == 0 or \
-           len(self.after_files) == 0:
-            print("\nBefore/After files not found\n")
-            exit(1)
-        self.before_files.sort()
-        self.after_files.sort()
-        os.chdir(self.cfg['project_path'])
+               len(self.after_files) == 0:
+            if self.before_kw != 'pre':
+                self.before_kw = 'pre'
+                self.after_kw = 'post'
+                self.file_search()
+            else:
+                print("\nBefore/After files not found\n")
+                exit(1)
+        else:
+            self.before_files.sort()
+            self.after_files.sort()
+            os.chdir(self.cfg['project_path'])
 
     def setup_logging(self):
         """ Set logging format, level, and handlers """
         log_file = self.mop_path + '/' + "BaselineParser.log"
-        if os.path.exists(log_file):
+        if os.path.exists(log_file) and self.verbose != 61:
             os.remove(log_file)
         msg_only_formatter = logging.Formatter('%(message)s')
         self.logger = logging.getLogger("BaselineParser")
         self.logger.setLevel(logging.DEBUG)
         # File Handler:
-        fh = logging.FileHandler(log_file)
-        fh.setFormatter(msg_only_formatter)
-        fh.setLevel(logging.DEBUG)
-        # Stream Handler:  - set level based on verbose settings (-c -s -v)
-        sh = logging.StreamHandler(sys.stdout)
-        sh.setFormatter(msg_only_formatter)
-        if self.verbose < 50:
-            sh.setLevel(self.verbose)
-        else:
-            #set debug for config only
-            sh.setLevel(10)
-        self.logger.addHandler(fh)
+        # Log to file, unless -c / --config is specified (because not all tests are run)
+        if self.verbose != 61:
+            fh = logging.FileHandler(log_file)
+            fh.setFormatter(msg_only_formatter)
+            fh.setLevel(logging.DEBUG)
+            self.logger.addHandler(fh)
+        # Stream Handler:  - set level based on verbose settings (-c -q -l -s -v)
+        # Log to stdout unless -l / --log is specified for log file only mode
         if self.verbose != 60:
+            sh = logging.StreamHandler(sys.stdout)
+            sh.setFormatter(msg_only_formatter)
+            if self.verbose < 50:
+                sh.setLevel(self.verbose)
+            else:
+                #set debug for config output mode
+                sh.setLevel(10)
             self.logger.addHandler(sh)
 
 
@@ -227,5 +236,6 @@ if __name__ == '__main__':
             logger.error(device.output)
 
     # Update log file permissions
-    os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
+    if os.path.exists(CONFIG.mop_path + '/' + "BaselineParser.log"):
+        os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
     print("")
