@@ -64,7 +64,9 @@ class Run(object):
                     if sum_flag is True:
                         output = output + line
         while '\n\n\n' in output:
-            output = output.replace("\n\n", "\n")
+            output = output.replace("\n\n\n", "\n\n")
+        output = output.replace('\n\nFAIL', '\nFAIL')
+        output = output.replace('\n\nERROR', '\nERROR')
         output = output.replace('Running ', '\nRunning ')
         print output
         exit()

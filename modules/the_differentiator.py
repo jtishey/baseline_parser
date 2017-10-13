@@ -29,7 +29,8 @@ class Run(object):
         self.get_command_lists()
         self.config_diff()
         self.test_ping_output()
-        self.print_summary()
+        if self.device.config.verbose != 30:
+            self.print_summary()
 
     def get_command_lists(self):
         """ For each yaml file in the config file, open testfile and gather command output. """

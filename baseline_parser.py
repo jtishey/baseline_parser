@@ -228,3 +228,4 @@ if __name__ == '__main__':
 
     # Update log file permissions
     os.chmod(CONFIG.mop_path + '/' + "BaselineParser.log", 0777)
+    print("")
