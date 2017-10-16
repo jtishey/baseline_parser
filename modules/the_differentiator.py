@@ -263,7 +263,7 @@ class Run(object):
         """ Run diff on before and after config """
         logger = logging.getLogger("BaselineParser")
         self.summary['show configuration'] = {'PASS': 0, 'FAIL': 0}
-        cmds = {'JUNOS': 'show configuration',
+        cmds = {'JUNOS': 'show configuration | display set',
                 'IOS': 'show run',
                 'XR': 'show configuration running-config',
                 'TiMOS': 'admin display-config'}
@@ -284,8 +284,12 @@ class Run(object):
                 if '@@' in line:
                     line = '=' * 36
                 if '+++' not in line and '---' not in line and line != '':
-                    logger.debug(line)
-                    if line[0] == '-' or line[0] == '+':
+                    if self.device.os_type == 'JUNOS':
+                        if line[0] != ' ':
+                            logger.debug(line)
+                    else:
+                        logger.debug(line)
+                    if line[0] == '+' or line[0] == '-':
                         self.summary['show configuration']['FAIL'] += 1
             logger.info('\n')
         else:
