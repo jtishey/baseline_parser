@@ -99,6 +99,24 @@ class Run(object):
         self.after_only_lines()
         self.print_totals()
 
+    def skip_check(self, line):
+        """"  Check iterator and blacklist against each line """
+        skip_line = False
+       # Skip lines that include a blacklisted word
+        for word in self.test_values[0]['blacklist']:
+            if word in line:
+                skip_line = True
+                return skip_line
+        # If an iterator is set, skip lines that don't have the iterator
+        if self.test_values[0]['iterate'] != ['all']:
+            iter_match = False
+            for word in self.test_values[0]['iterate']:
+                if word in line:
+                    iter_match = True
+            if iter_match is False:
+                skip_line = True
+        return skip_line
+
     def no_diff(self, line):
         """ Execute no-diff tests (indicating all indexes match before/after)"""
         after_line = ''
@@ -106,6 +124,11 @@ class Run(object):
         after_output = self.after_cmd_output[:]
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
         for i, after_line in enumerate(after_output):
+            skip_line = self.skip_check(after_line)
+            if skip_line:
+                after_line = ''
+                wrap_word = ''
+                continue
             after_line_orig = after_line
             after_line, wrap_word, wrap = self.fix_word_wrap(wrap_word, after_line, after_output, i)
             if wrap is True:
