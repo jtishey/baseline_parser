@@ -3,7 +3,7 @@
   command: show isis adjacency
   ignore-null: False
   iterate: [None]
-  blacklist: []
+  blacklist: ['UTC', 'adjacenc', 'Interface', '^']
   tests:
     - no-diff: [1, 0]
       info: "PASSED! ISIS adj to {{ pre[0] }} on {{ pre[1] }} is still Up"
