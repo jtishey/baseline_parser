@@ -3,7 +3,7 @@
   command: show mpls interface
   ignore-null: True
   iterate: [all]
-  blacklist: ['nterface', '^']
+  blacklist: ['nterface', 'minute', 'UTC', '^']
   tests:
     - no-diff: [0, -1]
       info: "PASSED! MPLS interface {{ pre[0] }} Operational status is still {{ pre[-1] }}"

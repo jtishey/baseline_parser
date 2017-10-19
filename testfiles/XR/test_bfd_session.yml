@@ -2,8 +2,8 @@
 - show_bfd_session:
   command:  show bfd session
   ignore-null: True
-  iterate: [UP, DOWN]
-  blacklist: [ADMIN]
+  iterate: ['UP', 'DOWN']
+  blacklist: ['ADMIN', 'n/a']
   tests:
     - no-diff: [0, 4]
       info: "PASSED! BFD neighbor on {{ pre[0] }} is still {{ pre[4] }}"

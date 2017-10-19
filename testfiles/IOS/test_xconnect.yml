@@ -3,7 +3,7 @@
   command: show xconnect all
   ignore-null: True
   iterate: [all]
-  blacklist: [nterface, '----', '=', '^', Segment, xconnect]
+  blacklist: [nterface, '----', '=', '^', Segment, xconnect, minute, UTC]
   tests:
     - no-diff: [2, 0, -2]
       info: "PASSED! XCONNECT on {{ pre[2] }} to {{ pre[-2] }} is still {{ pre[0] }}"

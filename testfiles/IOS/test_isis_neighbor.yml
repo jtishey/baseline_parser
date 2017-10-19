@@ -3,7 +3,7 @@
   command: show isis neighbor
   ignore-null: True
   iterate: [all]
-  blacklist: ['Tag', 'nterface', '^', 'isis']
+  blacklist: ['Tag', 'nterface', '^', 'isis', UTC, minute]
   tests:
     - no-diff: [1, 0, 3]
       info: "PASSED! ISIS adj to {{ pre[0] }} on {{ pre[1] }} is still {{ pre[3] }}"

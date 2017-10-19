@@ -3,7 +3,7 @@
   command: show mod
   ignore-null: True
   iterate: [all]
-  blacklist: ['Mod', 'mod', '----', 'OK', 'Ok', '.', 'Pass', 'Fail', '^', MAC, Power, Chassis]
+  blacklist: ['Mod', 'mod', '----', 'OK', 'Ok', '.', 'Pass', 'Fail', '^', MAC, Power, Chassis, minute, UTC]
   tests:
     - no-diff: [0, -2]
       info: "PASSED! Slot {{ pre[0] }} still has a {{ pre[-2] }}"

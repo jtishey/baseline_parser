@@ -2,7 +2,7 @@
 - show_bgp_summary:
   command: show bgp summary
   ignore-null: False
-  iterate: [Establ, Idle, Active, Open]
+  iterate: [Establ, Open]
   blacklist: [Peer]
   tests:
     - no-diff: [0, -1]
