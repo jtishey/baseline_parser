@@ -48,21 +48,17 @@ class Run(object):
             except KeyError:
                 logger.warn("ERROR:  " + self.test_values[0]['command'] + " not found in the baseline!")
                 continue
+            self.before_cmd_output = self.filter_output(self.before_cmd_output)
+            self.after_cmd_output = self.filter_output(self.after_cmd_output)
             self.test_cmd_output()
 
-    def test_cmd_output(self):
-        """ Gets before/after command and yaml test values to compare """
-        # Reset totals and variables
-        logger = logging.getLogger("BaselineParser")
-        logger.info("******** Command: " + self.test_values[0]['command'] + " ********")
-        self.summary[(self.test_values[0]['command'])] = {'PASS': 0, 'FAIL': 0}
-        line = ''
+    def filter_output(self, command_output):
+        """ Remove blacklisted lines and non-iterator lines from command output """
+        testable_output = []
         wrap_word = ''
-        for i, line in enumerate(self.before_cmd_output):
-            self.pass_status = 'UNSET'
-            self.delta_value = 0
+        for i, line in enumerate(command_output):
             skip_line = False
-            if wrap_word == self.before_cmd_output[i - 1]:
+            if wrap_word == command_output[i - 1]:
                 line = wrap_word + ' ' + line
             wrap_word = ''
             # Skip lines that include a blacklisted word
@@ -77,13 +73,29 @@ class Run(object):
                         iter_match = True
                 if iter_match is False:
                     skip_line = True
-            if skip_line:
-                continue
+            if skip_line is False:
+                try:
+                    line_wr = line.split()
+                    if len(line_wr) == 1:
+                        if command_output[i + 1][:4] == '    ':
+                            wrap_word = line[0]
+                            continue
+                except:
+                    pass
+                testable_output.append(line)
+        return testable_output
+
+    def test_cmd_output(self):
+        """ Gets before/after command and yaml test values to compare """
+        # Reset totals and variables
+        logger = logging.getLogger("BaselineParser")
+        logger.info("******** Command: " + self.test_values[0]['command'] + " ********")
+        self.summary[(self.test_values[0]['command'])] = {'PASS': 0, 'FAIL': 0}
+        line = ''
+        for i, line in enumerate(self.before_cmd_output):
+            self.pass_status = 'UNSET'
+            self.delta_value = 0
             line = line.split()
-            if len(line) == 1:
-                if self.before_cmd_output[i + 1][:4] == '    ':
-                    wrap_word = line[0]
-                    continue
             # NO-DIFF =  All indexes must match before/after
             if 'no-diff' in self.test_values[0]['tests'][0]:
                 self.no_diff(line)
@@ -99,41 +111,14 @@ class Run(object):
         self.after_only_lines()
         self.print_totals()
 
-    def skip_check(self, line):
-        """"  Check iterator and blacklist against each line """
-        skip_line = False
-       # Skip lines that include a blacklisted word
-        for word in self.test_values[0]['blacklist']:
-            if word in line:
-                skip_line = True
-                return skip_line
-        # If an iterator is set, skip lines that don't have the iterator
-        if self.test_values[0]['iterate'] != ['all']:
-            iter_match = False
-            for word in self.test_values[0]['iterate']:
-                if word in line:
-                    iter_match = True
-            if iter_match is False:
-                skip_line = True
-        return skip_line
-
     def no_diff(self, line):
         """ Execute no-diff tests (indicating all indexes match before/after)"""
-        after_line = ''
-        wrap_word = ''
-        after_output = self.after_cmd_output[:]
         line_id = self.test_values[0]['tests'][0]['no-diff'][0]
-        for i, after_line in enumerate(after_output):
-            skip_line = self.skip_check(after_line)
-            if skip_line:
-                after_line = ''
-                wrap_word = ''
-                continue
-            after_line_orig = after_line
-            after_line, wrap_word, wrap = self.fix_word_wrap(wrap_word, after_line, after_output, i)
-            if wrap is True:
-                continue
+        after_line = ''
+        for after_line in self.after_cmd_output:
             try:
+                after_line_orig = after_line
+                after_line = after_line.split()
                 if line[line_id] == after_line[line_id]:
                     for index in self.test_values[0]['tests'][0]['no-diff']:
                         # If an index fails, mark as failed
@@ -146,8 +131,6 @@ class Run(object):
                     # If it looped through indexes without failing, mark as pass
                     if self.pass_status == 'UNSET':
                         self.pass_status = 'PASS'
-                    if len(after_line_orig.split()) < len(after_line):
-                        self.after_cmd_output.remove(after_line[0])
                     self.after_cmd_output.remove(after_line_orig)
                     break
             except IndexError:
@@ -157,18 +140,13 @@ class Run(object):
 
     def delta(self, line):
         """ Execute delta tests (identifier / index/percent)"""
-        after_line = ''
-        wrap_word = ''
-        after_output = self.after_cmd_output[:]
         line_id = self.test_values[0]['tests'][0]['delta'][0]
         index = self.test_values[0]['tests'][0]['delta'][1]
         max_percent = self.test_values[0]['tests'][0]['delta'][2]
-        for i, after_line in enumerate(after_output):
-            after_line_orig = after_line
-            after_line, wrap_word, wrap = self.fix_word_wrap(wrap_word, after_line, after_output, i)
-            if wrap is True:
-                continue
+        for after_line in self.after_cmd_output:
             try:
+                after_line_orig = after_line
+                after_line = after_line.split()
                 if line[line_id] == after_line[line_id]:
                     if line[index].isdigit() and after_line[index].isdigit():
                         self.delta_value = abs(int(line[index]) - int(after_line[index]))
@@ -183,14 +161,29 @@ class Run(object):
                         else:
                             self.pass_status = 'FAIL'
                             self.delta_value = '100%'
-                    if len(after_line_orig.split()) < len(after_line):
-                        self.after_cmd_output.remove(after_line[0])
                     self.after_cmd_output.remove(after_line_orig)
                     break
             except IndexError:
                 continue
         self.pre = line
         self.post = after_line
+
+    def after_only_lines(self):
+        """ Account for lines in AFTER that aren't in BEFORE """
+        logger = logging.getLogger("BaselineParser")
+        if len(self.after_cmd_output) > 0:
+            for after_line in self.after_cmd_output:
+                self.summary[(self.test_values[0]['command'])]['FAIL'] += 1
+                self.post = after_line.split()
+                self.pre = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
+                try:
+                    line_id = self.test_values[0]['tests'][0]['no-diff'][0]
+                except:
+                    line_id = self.test_values[0]['tests'][0]['delta'][0]
+                    self.delta_value = '100%'
+                self.pre[line_id] = self.post[line_id]
+                msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
+                logger.warn(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
 
     def print_result(self):
         """ Print and count the results """
@@ -207,63 +200,6 @@ class Run(object):
             if not self.post:
                 self.post = ['null'] * 12
             logger.debug(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
-
-    def after_only_lines(self):
-        """ Account for lines in AFTER that aren't in BEFORE """
-        logger = logging.getLogger("BaselineParser")
-        if len(self.after_cmd_output) > 0:
-            wrap_word = ''
-            for i, after_line in enumerate(self.after_cmd_output):
-                skip_line = False
-                # If blacklist is set, skip those lines
-                for word in self.test_values[0]['blacklist']:
-                    if word in after_line:
-                        skip_line = True
-                # Fix word wrap
-                if wrap_word:
-                    after_line = wrap_word + ' ' + after_line
-                wrap_word = ''
-                try:
-                    if len(after_line.split()) == 1:
-                        if self.after_cmd_output[i + 1][:4] == '    ':
-                            wrap_word = after_line.split()[0]
-                            continue
-                except:
-                    wrap_word = ''
-                # If an iterator is set, skip lines that don't have the iterator
-                if self.test_values[0]['iterate'] != ['all']:
-                    for word in self.test_values[0]['iterate']:
-                        if word not in after_line:
-                            skip_line = True
-                if not skip_line:
-                    self.summary[(self.test_values[0]['command'])]['FAIL'] += 1
-                    self.post = after_line.split()
-                    self.pre = ['null', 'null', 'null', 'null', 'null', 'null', 'null', 'null']
-                    try:
-                        line_id = self.test_values[0]['tests'][0]['no-diff'][0]
-                    except:
-                        line_id = self.test_values[0]['tests'][0]['delta'][0]
-                        self.delta_value = '100%'
-                    self.pre[line_id] = self.post[line_id]
-                    msg = jinja2.Template(str(self.test_values[0]['tests'][0]['err']))
-                    logger.warn(msg.render(device=self.device, pre=self.pre, post=self.post, delta=self.delta_value))
-
-    def fix_word_wrap(self, wrap_word, after_line, after_output, i):
-        """ Check line for signs of word wrap and fix if detected """
-        after_line_orig = after_line
-        cont_flag = False
-        if wrap_word:
-            after_line = wrap_word + ' ' + after_line
-        wrap_word = ''
-        try:
-            after_line = after_line.split()
-            if len(after_line) == 1:
-                if after_output[i + 1][:4] == '    ':
-                    wrap_word = after_line[0]
-                    cont_flag = True
-        except:
-            conf_flag = False
-        return after_line, wrap_word, cont_flag
 
     def print_totals(self):
         """ Print command test results for all lines of that command output """
