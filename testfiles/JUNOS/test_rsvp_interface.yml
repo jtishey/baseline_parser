@@ -2,7 +2,7 @@
 - show_rsvp_interface:
   command:  show rsvp interface
   ignore-null: False
-  iterate: all
+  iterate: [all]
   blacklist: [RSVP, Active, Interface]
   tests:
     - no-diff: [0, 1, 2]

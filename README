@@ -1,10 +1,8 @@
 
-!!! STILL EARLY DEVELOPMENT !!!
-
  baseline_parser.py
 ###################
 
- Example usage: /opt/ipeng/scripts/baseline_parser/baseline_parser.py -m 233806
+ Example usage: baseline_check -m 233806
 
 USAGE:
 Required arguments:
@@ -31,7 +29,7 @@ Creating and Editing Testfiles:
 -------------------------------
 
 testfiles are located in /opt/ipeng/scripts/baseline_parser/testfiles/  in a seperate folder for each OS Type
-(JUNOS / IOS / XR / etc) 
+(JUNOS / IOS / XR / TiMOS)
 
 They are YAML files and are currently setup as follows:
 

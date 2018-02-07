@@ -2,7 +2,7 @@
 - show_ldp_neighbor:
   command:  show ldp neighbor
   ignore-null: False
-  iterate: all
+  iterate: [all]
   blacklist: [Interface]
   tests:
     - no-diff: [1, 0]

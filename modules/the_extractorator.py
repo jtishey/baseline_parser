@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 baseline_compare module to extract commands and output from Pinky_Baseliner
-john.tishey@windstream.com 2017
+john tishey 2017
 """
 
 # Step 1: Get the device hostname and Vendor/OS
@@ -12,7 +12,9 @@ def run(device):
     elif device.os_type == 'IOS':
         prompt = device.hostname + '#'
     elif device.os_type == 'XR':
-        prompt = 'RP/0/RP0/CPU0:' + device.hostname + '#'    
+        prompt = 'RP/0/RSP0/CPU0:' + device.hostname + '#'    
+    elif device.os_type == 'TiMOS':
+        prompt = ':' + device.hostname + '#'
     else:
         print("ERROR: Device OS not found or not yet supported")
         return ""
@@ -37,6 +39,8 @@ def extract(device, prompt):
                 if line[-1] != '>' or line[-1] != '#':
                     line = line.replace(prompt + '-re0>', '')
                     line = line.replace(prompt + '-re1>', '')
+                    line = line.replace('A' + prompt, '')
+                    line = line.replace('B' + prompt, '')
                     line = line.replace(prompt, '')
                     current_command = line
                     commands[current_command] = []

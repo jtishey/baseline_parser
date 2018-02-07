@@ -1,0 +1,10 @@
+---
+- ping_checks:
+  command:  ping
+  ignore-null: False
+  iterate: ['Success']
+  blacklist: []
+  tests:
+    - ping_check: [3]
+      info: "PASSED! Ping to {{ ping_address }} is still {{ pre[3] }}%"
+      err: "FAILED! Ping to {{ ping_address }} was {{ pre[3] }}% - is now {{ post[3] }}%"
